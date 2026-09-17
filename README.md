@@ -2,24 +2,24 @@
 
 QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生成する**ためのツールです。
 
-**正本は製品のコードそのもの**——このリポジトリは仕様書の写しを持ちません。人が維持するのは指示書2ページ（`AGENTS.md`・`guide.html`）だけです。
+仕様書の写しは持たず、AI は**製品のコードそのもの**を読んで書きます。人が維持するのは `AGENTS.md`（AI 向けの指示書）と `guide.html`（人向けの説明）の2ページだけです。
 
 ## 必要なもの
 
 | もの | 用途 | 補足 |
 |------|------|------|
-| **AI** | アシスタントを書く・検証を回す | 2種類のどちらでも作れます。**フォルダの中で動かせる AI**（AI 自身がこのフォルダを開いて読み、検証コマンドを打つ。Claude Code など。PC 上でも Web 上でも構いません）と、**フォルダを ZIP で渡す AI**（AI がフォルダを見られないので、チャットに ZIP を添付する。ChatGPT など）。動作確認済みは Claude Code と ChatGPT（有料版）。無料版のチャット AI は対象外です（確認しているのは有料版だけです） |
+| **AI** | アシスタントを書く・検証を回す | 2種類のどちらでも作れます。**フォルダの中で動かせる AI**＝AI 自身が Maker のフォルダを開いて読み、検証コマンドを打つ（Claude Code など。PC 上でも Web 上でも構いません）。**フォルダを ZIP で渡す AI**＝AI がフォルダを見られないので、チャットに ZIP を添付する（ChatGPT など）。動作確認済みは Claude Code と ChatGPT（有料版）。無料版のチャット AI は対象外です（確認しているのは有料版だけです） |
 | **製品のコード** | AI が読む正本。検証もこの中の検証エンジンで動きます | **サイトに入れてある版と同じもの**を使います。配布 ZIP を展開したフォルダ（`qa-heatmap-analytics/` か `qa-zero/`）、または自分のサイトに入れてあるプラグインのフォルダのコピー |
 | **PHP 7.4 以上** | 検証コマンド `validate.php` を動かす | **AI が検証コマンドを打つ場所に要ります**。手元の PC で AI を動かすなら PC に。Web 上の AI（Claude Code の Web 版や ChatGPT）なら AI 側にあるので、手元には不要 |
 
-**動作確認した製品の版**＝この一式は **QA Assistants 5.3.0.0** で確認しています（2026-09）。製品の版が変わったときは、`AGENTS.md` の中の「この版では／次の版から」の注記を確認してください。
+**動作確認した製品の版**＝この Maker は **QA Assistants 5.3.0.0** で確認しています（2026-09）。製品の版が変わったときは、`AGENTS.md` の中の「この版では／次の版から」の注記を確認してください。
 
 ## 使い方
 
 ### 準備（どちらの AI でも共通）
 
-1. このリポジトリをクローンする（git が無ければ「Code → Download ZIP」で展開する）
-2. **製品のコードのフォルダ**をリポジトリ直下に置く
+1. このリポジトリを手元に置く（`git clone`、または GitHub の「Code → Download ZIP」を展開）。できたフォルダを以下「**Maker のフォルダ**」と呼びます
+2. **製品のコードのフォルダ**を Maker のフォルダの中に置く（`AGENTS.md` と同じ階層）
 
 ```
 qa-assistant-maker/
@@ -34,13 +34,13 @@ qa-assistant-maker/
 
 **A. フォルダの中で動かせる AI（Claude Code など）**
 
-1. リポジトリ直下で AI を起動する。指示書 `AGENTS.md` が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。Claude Code は `CLAUDE.md` 経由で同じものを読みます。Gemini CLI は設定が要ります。対応しているツールの最新の一覧は [agents.md](https://agents.md/) を参照）。自動で読み込まれない AI では、最初に「`AGENTS.md` に従って作って」と伝えてください。
+1. Maker のフォルダを開いて AI を起動する（Claude Code なら、そのフォルダで `claude` を実行）。指示書 `AGENTS.md` が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。Claude Code は `CLAUDE.md` 経由で同じものを読みます。Gemini CLI は設定が要ります。対応しているツールの最新の一覧は [agents.md](https://agents.md/) を参照）。自動で読み込まれない AI では、最初に「`AGENTS.md` に従って作って」と伝えてください。
 2. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で頼む。AI は構成を一度だけ確認してから生成に入ります。
-3. AI が自分で `php validate.php ./qa-heatmap-analytics ./qa-assistant-{name}` を回して **VALID** を報告します。示されなければ「検証は通った？」と聞いてください。
+3. AI が自分で検証コマンド（`php validate.php ./qa-heatmap-analytics ./qa-assistant-{name}`）を回して **VALID** を報告します。示されなければ「検証は通った？」と聞いてください。
 
 **B. フォルダを ZIP で渡す AI（ChatGPT など）**
 
-1. 2 で製品のコードを置いた状態のリポジトリのフォルダを、**フォルダごと1つの ZIP** にする（展開後 20MB 前後・圧縮すると 7MB 程度・1,300 ファイルほど）。製品のコードが同じ ZIP に入っていないと検証が動きません。
+1. 準備の 2 で製品のコードを置いた状態の Maker のフォルダを、**フォルダごと1つの ZIP** にする（展開後 20MB 前後・圧縮すると 7MB 程度・1,300 ファイルほど）。製品のコードが同じ ZIP に入っていないと検証が動きません。
 2. 新しいチャットにその ZIP を添付し、次の文と一緒に「作ってほしいもの」を送る。フォルダを見られない AI は `AGENTS.md` を自動では読まないので、この文の1行目がその代わりです。
 
 ```
@@ -94,7 +94,7 @@ qa-assistant-maker/
 
 ## ライセンス
 
-**GPL-2.0-or-later**（全文は `LICENSE`）。この一式で生成したアシスタントは、**各自の著作権表示のもとで同じライセンスで配布**できます。
+**GPL-2.0-or-later**（全文は `LICENSE`）。この Maker で生成したアシスタントは、**各自の著作権表示のもとで同じライセンスで配布**できます。
 
 Licensed under **GPL-2.0-or-later** (see `LICENSE`). Assistants generated with this tool may be distributed under the same license, under each author's own copyright notice.
 
