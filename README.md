@@ -35,7 +35,7 @@ QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生�
 1. このリポジトリをクローンする
 2. **製品のコードのフォルダ**（上記）をリポジトリ直下に置く
 3. リポジトリ直下で **AI エージェントを起動する**
-   - **エージェント型（フォルダを開ける AI）は、多くが `AGENTS.md` を自動で読み込みます**（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など）。**Claude Code は `CLAUDE.md` 経由**で同じものを読みます。**設定が要るもの・自動で読まないもの**（Gemini CLI 等）には「`AGENTS.md` を読んでから作って」と伝えてください。
+   - **エージェント型（フォルダを開ける AI）は、多くが `AGENTS.md` を自動で読み込みます**（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Devin・Windsurf・Zed・Aider など。**対応しているツールの最新の一覧は [agents.md](https://agents.md/) が正本**です）。**Claude Code は `CLAUDE.md` 経由**で同じものを読みます。**設定が要るもの・自動で読まないもの**（Gemini CLI 等）には「`AGENTS.md` を読んでから作って」と伝えてください。
    - **チャット型（ChatGPT の Web 等）は自動では読みません**＝上の「フォルダを開けない AI（チャット型）で作るとき」に従ってください。
 4. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で伝える
 5. AI が生成 → **`php validate.php <製品のコードのフォルダ> <生成物>` で検証** → VALID を確認して完成（**AI がコマンドを実行できない場合は、この1行は人が打ってください**）
