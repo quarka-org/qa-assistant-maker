@@ -200,17 +200,17 @@ th, td{line-height:1.7}
 
     <section id="howto" style="--c:#3c6e8f">
       <div class="sec-head"><div class="sec-num">03</div><h2>AI への渡し方</h2></div>
-      <p class="lead">AI は<strong>2種類のどちらでも</strong>作れます。<strong>フォルダの中で動かせる AI</strong>（AI 自身がこの一式のフォルダを開いて読み、検証コマンドを打つ。Claude Code など。PC 上でも Web 上でも構いません）と、<strong>フォルダを ZIP で渡す AI</strong>（AI がフォルダを見られないので、チャットに ZIP を添付する。ChatGPT など）。動作確認済みは Claude Code と ChatGPT（有料版）。どちらの場合も、手元に <strong>製品のコードのフォルダ</strong>（配布 ZIP を展開したもの、または自分のサイトに入れてあるプラグインのフォルダをそのままコピーしたもの）を用意し、<strong>この一式のフォルダ直下に置きます</strong>。サイトに入れてある版と同じものを使ってください。<strong>PHP 7.4 以上</strong>は AI が検証コマンドを打つ場所に要ります（手元の PC で AI を動かすなら PC に。Web 上の AI なら AI 側にあるので不要）。</p>
+      <p class="lead">AI は<strong>2種類のどちらでも</strong>作れます。<strong>フォルダの中で動かせる AI</strong>（AI 自身が Maker のフォルダ（このリポジトリを手元に置いたフォルダ）を開いて読み、検証コマンドを打つ。Claude Code など。PC 上でも Web 上でも構いません）と、<strong>フォルダを ZIP で渡す AI</strong>（AI がフォルダを見られないので、チャットに ZIP を添付する。ChatGPT など）。動作確認済みは Claude Code と ChatGPT（有料版）。どちらの場合も、手元に <strong>製品のコードのフォルダ</strong>（配布 ZIP を展開したもの、または自分のサイトに入れてあるプラグインのフォルダをそのままコピーしたもの）を用意し、<strong>Maker のフォルダの中（<code>AGENTS.md</code> と同じ階層）に置きます</strong>。サイトに入れてある版と同じものを使ってください。<strong>PHP 7.4 以上</strong>は AI が検証コマンドを打つ場所に要ります（手元の PC で AI を動かすなら PC に。Web 上の AI なら AI 側にあるので不要）。</p>
 
       <p style="margin-top:14px"><strong>A. フォルダの中で動かせる AI（Claude Code など）</strong></p>
       <ul class="blist">
-        <li>この一式のフォルダで <strong>AI を起動する</strong>。<span class="sub">指示書 <code>AGENTS.md</code> が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。<strong>Claude Code は <code>CLAUDE.md</code> 経由</strong>で同じものを読みます。Gemini CLI は設定が要ります。対応しているツールの最新の一覧は <a href="https://agents.md/" target="_blank" rel="noopener">agents.md</a> を参照）。自動で読み込まれない AI では、最初に「<code>AGENTS.md</code> に従って作って」と伝えてください。</span></li>
+        <li>Maker のフォルダを開いて <strong>AI を起動する</strong>（Claude Code なら、そのフォルダで <code>claude</code> を実行）。<span class="sub">指示書 <code>AGENTS.md</code> が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。<strong>Claude Code は <code>CLAUDE.md</code> 経由</strong>で同じものを読みます。Gemini CLI は設定が要ります。対応しているツールの最新の一覧は <a href="https://agents.md/" target="_blank" rel="noopener">agents.md</a> を参照）。自動で読み込まれない AI では、最初に「<code>AGENTS.md</code> に従って作って」と伝えてください。</span></li>
         <li>あとは<strong>ふつうの日本語で頼むだけ</strong>。AI は構成を一度だけ確認してから生成に入り、自分で検証を回して <strong>VALID</strong> を示します。示されない場合は「検証は通った？」と聞いてください。</li>
       </ul>
 
       <p style="margin-top:14px"><strong>B. フォルダを ZIP で渡す AI（ChatGPT など）</strong></p>
       <ul class="blist">
-        <li>製品のコードを置いた状態のこの一式のフォルダを、<strong>フォルダごと1つの ZIP</strong> にして新しいチャットに添付する（展開後 20MB 前後・圧縮すると 7MB 程度）。<span class="sub">製品のコードが同じ ZIP に入っていないと検証が動きません。</span></li>
+        <li>製品のコードを置いた状態の Maker のフォルダを、<strong>フォルダごと1つの ZIP</strong> にして新しいチャットに添付する（展開後 20MB 前後・圧縮すると 7MB 程度）。<span class="sub">製品のコードが同じ ZIP に入っていないと検証が動きません。</span></li>
         <li>README の「B. フォルダを ZIP で渡す AI」にある文と一緒に、頼みたい内容を送る。<span class="sub">フォルダを見られない AI は <code>AGENTS.md</code> を自動では読まないので、その文の1行目が代わりになります。AI は5ファイルを作り、自分で検証を回して VALID を示し、アシスタントのフォルダを ZIP で返します。作れない項目があれば先に報告してくるので、別の内容に変えて続けてください。</span></li>
       </ul>
 
