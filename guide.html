@@ -154,7 +154,7 @@ th, td{line-height:1.7}
       <ul class="blist">
         <li><strong>製品のコードのフォルダ</strong>（<code>qa-heatmap-analytics/</code> か <code>qa-zero/</code>）
           <span class="sub">製品としてお使いのものと同じ中身です（配布 ZIP を展開したもの、または自分のサイトに入っているプラグインのフォルダの複製）。この中に、アシスタントの仕組み・取れるデータの一覧・検証プログラムが<strong>全部入っています</strong>。特別な準備は要りません。</span></li>
-        <li><strong>この一式</strong>（指示書 <code>CLAUDE.md</code>・検証ラッパー <code>validate.php</code>・見本 <code>examples/</code>）
+        <li><strong>この一式</strong>（指示書 <code>AGENTS.md</code>・検証ラッパー <code>validate.php</code>・見本 <code>examples/</code>）
           <span class="sub">人が維持するのは、この指示書1枚とこのページだけです。</span></li>
       </ul>
 
@@ -202,7 +202,7 @@ th, td{line-height:1.7}
       <div class="sec-head"><div class="sec-num">03</div><h2>AI への渡し方</h2></div>
       <p class="lead"><strong>要件はこれだけです。</strong> 使う AI は、<strong>Claude Code のように、フォルダ内のファイルを読んで検証コマンドを走らせられる AI</strong> を想定しています（<strong>動作確認済みは Claude Code</strong>）。コマンドを実行できない AI でも作れます——その場合、<strong>検証の1行だけ人が打ってください</strong>。手元には <strong>製品のコードのフォルダ</strong>（配布 ZIP を展開したもの、または自分のサイトに入れてあるプラグインのフォルダをそのままコピーしたもの）と <strong>PHP 7.4 以上</strong>が要ります。<strong>サイトに入れてある版と同じもの</strong>を置いてください。</p>
       <ul class="blist">
-        <li>この一式のフォルダを開いて <strong>AI エージェントを起動する</strong>（Claude Code は指示書 <code>CLAUDE.md</code> を自動で読み込みます。ほかの AI では「<code>CLAUDE.md</code> を読んでから作って」と伝えてください）。</li>
+        <li>この一式のフォルダを開いて <strong>AI エージェントを起動する</strong>（多くの AI は指示書 <code>AGENTS.md</code> を自動で読み込みます。Claude Code は <code>CLAUDE.md</code> 経由で同じものを読みます。自動で読まない AI には「<code>AGENTS.md</code> を読んでから作って」と伝えてください）。</li>
         <li><strong>製品のコードのフォルダの場所を伝える</strong>（同じフォルダに置いておけば、それだけで伝わります）。</li>
         <li>あとは<strong>ふつうの日本語で頼むだけ</strong>。技術用語は不要です。</li>
       </ul>
@@ -262,7 +262,7 @@ th, td{line-height:1.7}
 <footer>
   <div class="div"></div>
   QA アシスタントの作り方（人間向け）<br>
-  対になる AI 向け指示書は CLAUDE.md
+  対になる AI 向け指示書は AGENTS.md
 </footer>
 
 <script>
