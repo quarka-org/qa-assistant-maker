@@ -2,7 +2,7 @@
 
 QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生成する**ためのキットです。
 
-**正本は製品のコード（配布 ZIP）**——このリポジトリは仕様書の写しを持ちません。人が維持するのは指示書2ページ（`CLAUDE.md`・`guide.html`）だけです。
+**正本は製品のコードそのもの**——このリポジトリは仕様書の写しを持ちません。人が維持するのは指示書2ページ（`CLAUDE.md`・`guide.html`）だけです。
 
 ## 必要なもの
 
@@ -14,9 +14,9 @@ QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生�
 
 1. このリポジトリをクローンする
 2. **製品のコードのフォルダ**（上記）をリポジトリ直下に置く
-3. リポジトリ直下で **AI エージェントを起動する**（`CLAUDE.md` が自動で読み込まれます）
+3. リポジトリ直下で **AI エージェントを起動する**（Claude Code は `CLAUDE.md` を自動で読み込みます。ほかの AI では「`CLAUDE.md` を読んでから作って」と伝えてください）
 4. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で伝える
-5. AI が生成 → **`php validate.php <製品ZIPの展開先> <生成物>` で検証** → VALID を確認して完成（**AI がコマンドを実行できない場合は、この1行は人が打ってください**）
+5. AI が生成 → **`php validate.php <製品のコードのフォルダ> <生成物>` で検証** → VALID を確認して完成（**AI がコマンドを実行できない場合は、この1行は人が打ってください**）
 
 人向けの詳しい説明（渡すもの・正本マップ・「VALID」の意味・動かないときの3チェック）は **[guide.html](./guide.html)** を参照してください。
 
@@ -26,7 +26,7 @@ QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生�
 qa-assistant-maker/
 ├── CLAUDE.md              AI 向け指示書（間違えると壊れる規則＋どこを読むか、だけ）
 ├── guide.html             人間向け使い方ページ
-├── validate.php           検証ラッパー（製品 ZIP 内の検証エンジンを呼ぶだけの glue＝構造・参照の整合・翻訳・パッケージ構成の4検査を全部呼ぶ）
+├── validate.php           検証ラッパー（製品のコードに入っている検証エンジンを呼ぶだけの glue＝構造・参照の整合・翻訳・パッケージ構成の4検査を全部呼ぶ）
 ├── assets/
 │   └── default-icon.png   デフォルトアイコン
 └── examples/              動く見本4本（qa-assistant-sample / qa-assistant-form-sample / qa-assistant-hitokoto / qa-assistant-lp-bounce）
@@ -56,7 +56,6 @@ qa-assistant-maker/
 **GPL-2.0-or-later**（全文は `LICENSE`）。この一式で生成したアシスタントは、**各自の著作権表示のもとで同じライセンスで配布**できます。
 
 Licensed under **GPL-2.0-or-later** (see `LICENSE`). Assistants generated with this kit may be distributed under the same license, under each author's own copyright notice.
-
 
 ## 由来
 
