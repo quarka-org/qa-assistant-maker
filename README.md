@@ -34,7 +34,7 @@ qa-assistant-maker/
 
 **A. エージェント型（Claude Code など）**
 
-1. リポジトリ直下で AI を起動する。指示書 `AGENTS.md` が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。Claude Code は `CLAUDE.md` 経由で同じものを読みます。Gemini CLI は設定が要ります）。自動で読み込まれない AI では、最初に「`AGENTS.md` に従って作って」と伝えてください。
+1. リポジトリ直下で AI を起動する。指示書 `AGENTS.md` が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。Claude Code は `CLAUDE.md` 経由で同じものを読みます。Gemini CLI は設定が要ります。対応しているツールの最新の一覧は [agents.md](https://agents.md/) を参照）。自動で読み込まれない AI では、最初に「`AGENTS.md` に従って作って」と伝えてください。
 2. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で頼む。AI は構成を一度だけ確認してから生成に入ります。
 3. AI が自分で `php validate.php ./qa-heatmap-analytics ./qa-assistant-{name}` を回して **VALID** を報告します。示されなければ「検証は通った？」と聞いてください。
 
