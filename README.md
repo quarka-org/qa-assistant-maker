@@ -1,20 +1,47 @@
 # QA Assistant Maker
 
-QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生成する**ためのキットです。
+QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生成する**ためのツールです。
 
 **正本は製品のコードそのもの**——このリポジトリは仕様書の写しを持ちません。人が維持するのは指示書2ページ（`AGENTS.md`・`guide.html`）だけです。
 
 ## 必要なもの
 
-- **AI エージェント**——`AGENTS.md`（この一式の指示書）のように、**フォルダの中のファイルを読んで、検証コマンドを走らせられる**もの。**動作確認済みは Claude Code**（`AGENTS.md` を置いてあるので、`AGENTS.md` を読む AI ならそのまま使えます）。コマンドを実行できない AI でも生成はできます（その場合、検証の1行だけ人が打ってください）。
-- **製品のコードを手元に置く**——**配布 ZIP を展開したフォルダ**（`qa-heatmap-analytics/` か `qa-zero/`）、または**自分のサイトに入れてあるプラグインのフォルダをそのままコピー**したもの。検証（`validate.php`）は製品側の検証エンジンを手元で読んで動くため、実物が要ります。**サイトに入れてある版と同じものを置いてください**（対応版数がずれると、通るはずのものが通らなくなります）。
-- **PHP 7.4 以上**（検証に使います）
+| もの | 用途 | 補足 |
+|------|------|------|
+| **AI** | アシスタントを書く・検証を回す | 2種類のどちらでも作れます。**エージェント型**（フォルダを開いてコマンドを打てる AI。動作確認済みは Claude Code）と、**チャット型**（Web のチャット。動作確認済みは ChatGPT 有料版）。無料版のチャット AI は対象外です（確認しているのは有料版だけです） |
+| **製品のコード** | AI が読む正本。検証もこの中の検証エンジンで動きます | **サイトに入れてある版と同じもの**を使います。配布 ZIP を展開したフォルダ（`qa-heatmap-analytics/` か `qa-zero/`）、または自分のサイトに入れてあるプラグインのフォルダのコピー |
+| **PHP 7.4 以上** | 検証コマンド `validate.php` を動かす | **エージェント型でローカルに検証するときだけ**。チャット型に検証させる場合は不要（AI 側のサーバーで動きます） |
 
 **動作確認した製品の版**＝この一式は **QA Assistants 5.3.0.0** で確認しています（2026-09）。製品の版が変わったときは、`AGENTS.md` の中の「この版では／次の版から」の注記を確認してください。
 
-### フォルダを開けない AI（チャット型）で作るとき
+## 使い方
 
-**ChatGPT（有料版・Web）でも作れます。** このフォルダを、**製品のコードを置いた状態のまま1つの ZIP にして添付**し、次の文と一緒に「作ってほしいもの」を送ってください。ZIP を展開して指示書と見本を読み、5ファイルを作り、検証コマンドを自分で実行して VALID を出し、できたフォルダを ZIP で返すところまで自走することを 2026-09 に確認しています（製品のコード込みで**展開後 20MB 前後・圧縮すると 7MB 程度**・1,300 ファイルほどになります）。
+### 準備（どちらの AI でも共通）
+
+1. このリポジトリをクローンする（git が無ければ「Code → Download ZIP」で展開する）
+2. **製品のコードのフォルダ**をリポジトリ直下に置く
+
+```
+qa-assistant-maker/
+├── AGENTS.md                 指示書（AI が読む）
+├── validate.php              検証プログラム
+├── examples/                 見本4本
+├── qa-heatmap-analytics/     ← 2 で置く製品のコード（サイトと同じ版）
+└── qa-assistant-{name}/      ← AI がここに作る
+```
+
+### AI に作らせる（使う AI に合わせて A か B）
+
+**A. エージェント型（Claude Code など）**
+
+1. リポジトリ直下で AI を起動する。指示書 `AGENTS.md` が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。Claude Code は `CLAUDE.md` 経由で同じものを読みます。Gemini CLI は設定が要ります）。自動で読み込まれない AI では、最初に「`AGENTS.md` に従って作って」と伝えてください。
+2. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で頼む。AI は構成を一度だけ確認してから生成に入ります。
+3. AI が自分で `php validate.php ./qa-heatmap-analytics ./qa-assistant-{name}` を回して **VALID** を報告します。示されなければ「検証は通った？」と聞いてください。
+
+**B. チャット型（ChatGPT 有料版など）**
+
+1. 2 で製品のコードを置いた状態のリポジトリのフォルダを、**フォルダごと1つの ZIP** にする（展開後 20MB 前後・圧縮すると 7MB 程度・1,300 ファイルほど）。製品のコードが同じ ZIP に入っていないと検証が動きません。
+2. 新しいチャットにその ZIP を添付し、次の文と一緒に「作ってほしいもの」を送る。チャット型は `AGENTS.md` を自動では読まないので、この文の1行目がその代わりです。
 
 ```
 添付の ZIP は「QA Assistant Maker」のフォルダを丸ごと固めたものです。展開して、直下の AGENTS.md を AI 向けの指示書として読み、これに従ってください。製品のコードは同じ ZIP の中の qa-heatmap-analytics フォルダに入っています。見本は examples フォルダにあります。
@@ -26,19 +53,12 @@ QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生�
 できたら、アシスタントのフォルダ（manifest.json、lang/ja.json、lang/en.json、PHP、icon.png）を丸ごと1つの ZIP にして、ダウンロードできるようにしてください。
 ```
 
-- **チャット型は `AGENTS.md` を自動では読みません。** 上の文の1行目がその代わりです（この一言が抜けると、指示書を読まないまま作り始めます）。
-- **無料版は対象外**です（確認しているのは有料版だけです）。
-- 返ってきた ZIP を展開すると `qa-assistant-（名前）/` ができます。そのまま WordPress の「プラグインのアップロード」に使えます。手元に PHP があれば `php validate.php` を1回かけてから入れると確実です。
+3. AI は ZIP の中の指示書と見本を読み、5ファイルを作って自分で検証を回し、VALID の出力とアシスタントの ZIP を返します。作れない項目があれば先に報告してくるので、別の内容に変えて続けてください。ZIP を展開すると `qa-assistant-{name}/` ができます（2026-09 に ChatGPT 有料版で確認）。
 
-## 使い方
+### 仕上げ（どちらの AI でも共通）
 
-1. このリポジトリをクローンする
-2. **製品のコードのフォルダ**（上記）をリポジトリ直下に置く
-3. リポジトリ直下で **AI エージェントを起動する**
-   - **エージェント型（フォルダを開ける AI）は、多くが `AGENTS.md` を自動で読み込みます**（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など）。**Claude Code は `CLAUDE.md` 経由**で同じものを読みます。**設定が要るもの・自動で読まないもの**（Gemini CLI 等）には「`AGENTS.md` を読んでから作って」と伝えてください。
-   - **チャット型（ChatGPT の Web 等）は自動では読みません**＝上の「フォルダを開けない AI（チャット型）で作るとき」に従ってください。
-4. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で伝える
-5. AI が生成 → **`php validate.php <製品のコードのフォルダ> <生成物>` で検証** → VALID を確認して完成（**AI がコマンドを実行できない場合は、この1行は人が打ってください**）
+1. **WordPress に入れる**＝`qa-assistant-{name}/` を `wp-content/plugins/` に置いて有効化する（ZIP のまま「プラグインのアップロード」でも可）。「AI アシスタント」画面にカードとして現れます。
+2. **実データで数字を見る**＝VALID は「壊れていない」であって「数字が正しい」ではありません。管理画面の数字と桁が合っているか、期間を広げて数字が減らないかを見てください。おかしければ AI に「この数字が管理画面と合わない。材料の選び方を実コードで確認して」と伝えます。
 
 人向けの詳しい説明（渡すもの・正本マップ・「VALID」の意味・動かないときの3チェック）は **[guide.html](./guide.html)** を参照してください。
 
@@ -55,7 +75,7 @@ qa-assistant-maker/
 └── examples/              動く見本4本（qa-assistant-sample / qa-assistant-form-sample / qa-assistant-hitokoto / qa-assistant-lp-bounce）
 ```
 
-- **仕様の説明書はこのリポジトリにありません。** schema・データ材料の一覧（semantics 宣言つき）・QAL 文法・動作コードは、すべて**製品のコードの中の実物**を読みます（`AGENTS.md` がパスを案内します）。写しが無いので古くなりません。
+- **仕様の説明書はこのリポジトリにありません。** schema・データ材料の一覧（semantics 宣言つき）・QAL 文法・動作コードは、すべて**製品のコードの中の実物**を読みます（`AGENTS.md` がパスを案内します）。
 
 ## 生成されるファイル
 
@@ -67,8 +87,6 @@ qa-assistant-maker/
 | `qa-assistant-{name}.php` | WordPress プラグインヘッダー |
 | `icon.png` | アイコン（無指定なら `assets/default-icon.png` をコピー） |
 
-生成したプラグインフォルダを、QA Assistants / QA ZERO が入った WordPress の `wp-content/plugins/` に置いて有効化すると、「AI アシスタント」画面で動きます。
-
 ## 動作環境
 
 - 生成したアシスタントの実行: QA Assistants / QA ZERO（WordPress プラグイン）。QAL でデータを取るアシスタントも両環境で動作（`wp_posts` マテリアルのみ QA Assistants 限定）。
@@ -78,7 +96,7 @@ qa-assistant-maker/
 
 **GPL-2.0-or-later**（全文は `LICENSE`）。この一式で生成したアシスタントは、**各自の著作権表示のもとで同じライセンスで配布**できます。
 
-Licensed under **GPL-2.0-or-later** (see `LICENSE`). Assistants generated with this kit may be distributed under the same license, under each author's own copyright notice.
+Licensed under **GPL-2.0-or-later** (see `LICENSE`). Assistants generated with this tool may be distributed under the same license, under each author's own copyright notice.
 
 ## 由来・問い合わせ
 
