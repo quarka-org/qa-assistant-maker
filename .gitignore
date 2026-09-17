@@ -1,0 +1,15 @@
+# 展開した製品 ZIP（利用者が自分で置くもの・配布物ではない）
+/qa-heatmap-analytics/
+/qa-zero/
+*.zip
+
+# 生成したアシスタント（作業中のもの）
+/out/
+/work/
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

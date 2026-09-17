@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "name": "Landing Page Bounce Check",
+    "description": "Calculates the bounce rate of every page visitors land on first, so you can fix the entrances that lose the most visitors"
+  },
+  "msg": {
+    "welcome": "Hello. This is the **Landing Page Bounce Check**.\nIt looks for entrances where visitors arrive and leave straight away.",
+    "ask_period": "Choose the period and the minimum number of visits to include.\nPages with very few visits swing wildly and will mislead you.",
+    "analyzing": "Aggregating landing pages for {$period_start} - {$period_end}...",
+    "result_head": "Done. Here is the site-wide picture first.",
+    "table_intro": "Bounce rate per landing page. Start with the **red rows**.\nClick a row to see the diagnosis and what to do about that page.",
+    "pick_row": "Click a row you care about, or change the conditions and run it again.",
+    "detail_head": "Looking at **{$selected_title}**.\nURL: [{$selected_url}]({$selected_url})",
+    "next": "What would you like to do next?",
+    "no_data": "There is no visit data for this period.\nPlease try a different period.",
+    "no_match": "No landing page reached the minimum number of visits ({$min_sessions}).\nLower the minimum or widen the period.",
+    "error": "Something went wrong while fetching the data.\nPlease wait a moment and try again."
+  },
+  "form": {
+    "period": "Period to analyze",
+    "min_sessions": "Minimum visits to include",
+    "min_1": "All landing pages",
+    "min_10": "10 visits or more (recommended)",
+    "min_30": "30 visits or more",
+    "min_100": "100 visits or more"
+  },
+  "btn": {
+    "analyze": "Analyze with these settings",
+    "back": "Back to the list",
+    "redo": "Change settings and retry"
+  },
+  "sc": {
+    "title": "Site total (selected period)",
+    "sessions": "Visits",
+    "bounce_rate": "Site bounce rate",
+    "bounce_rate_sub": "{$site_bounces|integer} bounces / {$site_sessions|integer} visits",
+    "high": "Entrances at 70% or above",
+    "checked": "Landing pages checked"
+  },
+  "unit": {
+    "sessions": "visits",
+    "pages": "pages"
+  },
+  "cal": {
+    "site_title": "Site-wide reading",
+    "site_bad": "The site-wide bounce rate is **{$site_bounce_rate|percentage}**, which is high. What your entrances offer may not match what visitors expected.\nStart with **{$worst_title}** ({$worst_rate|percentage}).",
+    "site_mid": "The site-wide bounce rate is **{$site_bounce_rate|percentage}** - a common level.\nStill, **{$high_count|integer} page(s)** are above 70%. Check **{$worst_title}** first.",
+    "site_good": "The site-wide bounce rate is **{$site_bounce_rate|percentage}**, which is healthy.\nAt this level the remaining upside is page by page. Look only at the high rows below.",
+    "detail_numbers": "Visits **{$selected_sessions|integer}** / bounces **{$selected_bounces|integer}** / bounce rate **{$selected_rate|percentage}**\nThis entrance collects **{$selected_share|percentage}** of all visits to the site."
+  },
+  "adv": {
+    "urgent_title": "Priority: high (large impact)",
+    "urgent": "Many visits and a high bounce rate means the **absolute number of visitors lost here is large**. Fixing this page pays off quickly.\n\nWhat to check, in order:\n1. Does the wording of the search result or ad match the heading at the top of the page?\n2. Does the first screen (before scrolling) make clear what can be done here?\n3. Is there a link or button to the next step within that first screen?",
+    "bad_title": "High bounce entrance",
+    "bad": "The bounce rate here is **{$selected_rate|percentage}**, which is high. Visits are still modest, so this is the stage for forming a hypothesis.\n\nCheck whether the heading of this page matches what the traffic source promised.",
+    "mid_title": "A normal level",
+    "mid": "A bounce rate of **{$selected_rate|percentage}** is within the usual range.\nFor a page people read and leave satisfied (an article or a glossary entry) this is fine. If you want visitors to move on, revisit where the next-step link sits.",
+    "good_title": "An entrance that works",
+    "good": "A bounce rate of **{$selected_rate|percentage}** is healthy. This entrance guides visitors onward well.\nConsider reusing its heading and navigation pattern on the entrances that bounce hardest."
+  },
+  "tbl": {
+    "lp": "Bounce rate by landing page"
+  },
+  "col": {
+    "page_id": "Page ID",
+    "title": "Landing page",
+    "url": "URL",
+    "sessions": "Visits",
+    "bounces": "Bounces",
+    "bounce_rate": "Bounce rate",
+    "session_share": "Share of all visits"
+  },
+  "chart": {
+    "bounce": "Landing pages with the highest bounce rate"
+  }
+}

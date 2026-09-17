@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="QA アシスタントの作り方（人間向け）。渡すもの／正本マップ／Claude への渡し方／VALID の意味／動かないときの3チェック。">
+<title>QA アシスタントの作り方 — 使い方</title>
+<style>
+:root{
+  --bg:#f2f4f7; --panel:#fff; --ink:#2d2c29; --ink-strong:#201f1c; --muted:#6c6c66;
+  --line:#dfe4ea; --line-soft:#eef1f5; --accent:#2f5575; --radius:10px;
+  --shadow:none; --maxw:1080px;
+  --hi:#A32D2D; --hi-bg:#FCEBEB; --mid:#854F0B; --mid-bg:#FAEEDA; --ok:#157457; --ok-bg:#e8f4ee; --info:#185FA5;
+  --green:#34a37c; --green-bright:#3fc492;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Segoe UI",Meiryo,system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:2.2;-webkit-font-smoothing:antialiased;letter-spacing:.01em;font-size:15px}
+.hero{position:relative;overflow:hidden;background:linear-gradient(140deg,#24425f 0%,#162a40 72%);
+  color:#eef2f6;border-top:3px solid var(--green);text-align:left}
+.hero::before{content:"";position:absolute;top:-95px;right:-70px;width:300px;height:300px;
+  border:1.5px solid rgba(255,255,255,.05);border-radius:50%;pointer-events:none}
+.hero::after{content:"";position:absolute;top:-25px;right:34px;width:170px;height:170px;
+  border:1.5px solid rgba(52,163,124,.13);border-radius:50%;pointer-events:none}
+.hero-inner{position:relative;max-width:var(--maxw);margin:0 auto;padding:52px 34px 46px;z-index:1;text-align:left}
+.hero .kicker{display:inline-flex;align-items:center;gap:9px;color:#9fbbd6;font-size:12.5px;font-weight:700;letter-spacing:.1em}
+.hero .kicker .dot{width:9px;height:9px;border-radius:50%;background:var(--green-bright);box-shadow:0 0 0 4px rgba(63,196,146,.18)}
+.hero h1{color:#fff;font-size:39px;line-height:1.18;margin:18px 0 0;letter-spacing:.01em;font-weight:800}
+.hero h1::after{content:"";display:block;width:56px;height:4px;background:var(--green-bright);border-radius:2px;margin-top:18px}
+.hero .tagline{color:#c7d7e8;font-size:16px;line-height:1.75;margin:18px 0 0;max-width:660px}
+.hero .meta{margin-top:24px;display:flex;flex-wrap:wrap;gap:9px}
+.hero .meta span{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:5px 14px;font-size:12.5px;color:#d9e4ef}
+.hero .meta span b{color:#8db8e0;font-weight:700;margin-right:6px}
+.cards{position:relative;z-index:2;max-width:var(--maxw);margin:-34px auto 0;padding:0 20px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.kc{background:var(--panel);border:0.5px solid var(--line);border-radius:10px;padding:18px 21px;border-top:3px solid var(--accent)}
+.kc.ok{border-top-color:var(--ok)} .kc.warn{border-top-color:var(--hi)}
+.kc .lbl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.kc .num{font-size:23px;font-weight:700;color:#1c3d5a;line-height:1.2}
+.kc .txt{font-size:15px;font-weight:700;color:#1c3d5a;line-height:1.4;margin-top:2px}
+.layout{max-width:var(--maxw);margin:0 auto;padding:30px 20px 0}
+nav.toc{position:sticky;top:24px;width:218px;flex:0 0 218px;font-size:14px}
+nav.toc h3{font-size:11px;letter-spacing:.14em;color:var(--muted);margin:0 0 10px;padding-left:12px}
+nav.toc a{display:flex;gap:10px;color:var(--ink);text-decoration:none;padding:7px 12px;border-radius:10px;
+  border-left:2px solid transparent;transition:.15s}
+nav.toc a .n{font-size:11px;font-weight:700;color:var(--muted);width:16px}
+nav.toc a:hover{background:#fff;color:var(--ink-strong)}
+nav.toc a.active{background:#fff;color:#1c3d5a;border-left-color:var(--accent);font-weight:600;box-shadow:var(--shadow)}
+nav.toc a.active .n{color:var(--accent)}
+main{flex:1 1 auto;min-width:0;padding-bottom:60px}
+section{--c:var(--accent);position:relative;background:var(--panel);border:0.5px solid var(--line);border-radius:var(--radius);
+  padding:32px 36px;margin-bottom:26px;box-shadow:var(--shadow);scroll-margin-top:20px}
+section::before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:4px;background:var(--c);border-radius:0 4px 4px 0;opacity:.8}
+.sec-head{display:flex;align-items:center;gap:13px;margin-bottom:2px}
+.sec-num{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:14px;
+  color:var(--c);background:color-mix(in srgb,var(--c) 20%,#fff);border:1px solid color-mix(in srgb,var(--c) 34%,#fff)}
+section h2{margin:0;font-size:19px;font-weight:700;color:var(--ink-strong)}
+section>.lead{color:var(--muted);margin:10px 0 4px;font-size:14px}
+.q{font-size:13.5px;color:color-mix(in srgb,var(--accent) 84%,#444);background:color-mix(in srgb,var(--accent) 10%,#fff);
+  border-radius:9px;padding:11px 15px;margin:14px 0 20px;display:flex;gap:8px;align-items:baseline}
+.q b{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--accent);white-space:nowrap}
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:6px 0 14px}
+.mrow .m{background:var(--line-soft);border-radius:11px;padding:13px 15px}
+.mrow .m label{font-size:12px;color:var(--muted);display:block;margin-bottom:3px}
+.mrow .m .v{font-size:21px;font-weight:700;color:var(--ink-strong)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0}
+th{text-align:left;font-weight:700;font-size:12.5px;color:var(--muted);padding:7px 10px;background:var(--line-soft)}
+td{padding:11px 12px;border-bottom:0.5px solid var(--line-soft);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.sb{display:flex;align-items:center;gap:8px}
+.sb .bar{flex:1;height:8px;background:var(--line-soft);border-radius:5px;overflow:hidden}
+.sb .fill{height:100%;border-radius:5px}
+.sb .lab{font-size:13.5px;font-weight:700;min-width:36px;text-align:right}
+.fii{margin:15px 0}
+.fii .l{font-size:13.5px;font-weight:700;color:var(--muted);margin-bottom:2px;display:flex;align-items:center;gap:7px}
+.fii .l::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted);flex:0 0 auto}
+.fii.fact .l{color:var(--accent)} .fii.fact .l::before{background:var(--accent)}
+.fii.interp .l{color:var(--info)} .fii.interp .l::before{background:var(--info)}
+.fii.move .l{color:var(--ok)} .fii.move .l::before{background:var(--ok)}
+.fii.risk .l{color:var(--hi)} .fii.risk .l::before{background:var(--hi)}
+.st{border:0.5px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:12px}
+.st h4{margin:0 0 7px;font-size:16px;font-weight:700;color:var(--ok)}
+.matrix{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;border-radius:11px;overflow:hidden;margin:6px 0}
+.mc{padding:14px;min-height:96px}
+.mc h4{margin:0 0 7px;font-size:14px;font-weight:700}
+.mc ul{margin:0;padding:0;list-style:none;font-size:13px}.mc li{padding:2px 0}.mc li::before{content:"· ";opacity:.6}
+.mc.hh{background:var(--hi-bg);color:var(--hi)} .mc.hl{background:var(--mid-bg);color:var(--mid)}
+.mc.lh{background:#E6F1FB;color:var(--info)} .mc.ll{background:var(--ok-bg);color:var(--ok)}
+.maxis{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:4px 0}
+.ck{list-style:none;margin:0;padding:0;font-size:14px}
+.ck li{padding:5px 0;border-bottom:0.5px solid var(--line-soft)}.ck li:last-child{border-bottom:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.note{background:var(--line-soft);border-radius:11px;padding:12px 16px;font-size:14px;margin-top:8px}
+footer{max-width:var(--maxw);margin:0 auto;padding:14px 20px 60px;color:var(--muted);font-size:13px;text-align:center}
+footer .div{width:40px;height:3px;border-radius:3px;background:var(--line);margin:0 auto 14px}
+@media(max-width:860px){.layout{display:block;padding-top:26px}nav.toc{display:none}.hero h1{font-size:29px}section{padding:22px 18px}}
+@media(max-width:600px){.hero h1{font-size:26px}.hero-inner{padding:38px 22px 34px}}
+section h2{line-height:1.4}            
+th, td{line-height:1.7}                
+.mrow .m .v, .kc .num, .kc .txt{line-height:1.3}  
+.mc h4, .mc li{line-height:1.7}        
+.q{line-height:1.85}                   
+.sec-num{line-height:1}                
+</style>
+<style>
+  .layout{display:flex;gap:34px;align-items:flex-start}
+  strong{color:var(--ink-strong);font-weight:700}
+  section h3{font-size:15px;font-weight:700;margin:26px 0 8px;color:var(--ink-strong);display:flex;align-items:center;gap:9px;line-height:1.5}
+  section h3::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);opacity:.8;flex:0 0 auto}
+  ul.blist{margin:6px 0 4px;padding-left:4px;list-style:none}
+  ul.blist>li{margin:8px 0;padding-left:22px;position:relative;line-height:1.95}
+  ul.blist>li::before{content:"";position:absolute;left:4px;top:14px;width:6px;height:6px;border-radius:2px;background:color-mix(in srgb,var(--c) 55%,#cdcabf)}
+  ul.blist>li .sub{display:block;font-size:13px;color:var(--muted);line-height:1.8;margin-top:1px}
+  .figbox{background:var(--line-soft);border:0.5px solid var(--line);border-radius:11px;padding:18px 20px 14px;margin:16px 0 6px}
+  .fig{display:block;width:100%;height:auto}
+  .fig-cap{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.7}
+  pre.pp{background:#12222f;color:#e7eef4;border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.8;overflow-x:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:10px 0}
+  @media(max-width:860px){.layout{display:block}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kicker"><span class="dot"></span>QA ASSISTANT ／ 使い方</div>
+    <h1>QA アシスタントの作り方</h1>
+    <div class="tagline">製品の ZIP と、この一式を Claude に渡すと、QA Assistants / QA ZERO の「AIアシスタント」画面で動くアシスタントを1本作ってくれます。人が読むのはこのページだけで足りるように作ってあります。</div>
+    <div class="meta">
+      <span><b>渡すもの</b> 製品 ZIP ＋ この一式</span>
+      <span><b>使う人</b> どなたでも（コードの知識は不要）</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc" id="toc">
+    <h3>もくじ</h3>
+    <a href="#what"><span class="n">01</span>これは何か</a>
+    <a href="#map"><span class="n">02</span>正本マップ（何が真実か）</a>
+    <a href="#howto"><span class="n">03</span>Claude への渡し方</a>
+    <a href="#valid"><span class="n">04</span>「VALID」の意味</a>
+    <a href="#trouble"><span class="n">05</span>動かないときの3チェック</a>
+  </nav>
+
+  <main>
+
+    <section id="what" style="--c:#1d4e79">
+      <div class="sec-head"><div class="sec-num">01</div><h2>これは何か</h2></div>
+      <p class="lead">アシスタントは、<strong>4つのファイル（動作定義・翻訳2つ・プラグインの入り口）＋アイコン</strong>でできています。これを手で書くのは大変なので、<strong>Claude に書かせる</strong>ための道具立てがこの一式です。</p>
+
+      <h3>渡すもの（2つだけ）</h3>
+      <ul class="blist">
+        <li><strong>製品の配布 ZIP を展開したフォルダ</strong>（<code>qa-heatmap-analytics/</code> か <code>qa-zero/</code>）
+          <span class="sub">製品としてお使いのものと同じ、ふつうのプラグイン ZIP です。この中に、アシスタントの仕組み・取れるデータの一覧・検証プログラムが<strong>全部入っています</strong>。特別な準備は要りません。</span></li>
+        <li><strong>この一式</strong>（指示書 <code>CLAUDE.md</code>・検証ラッパー <code>validate.php</code>・見本 <code>examples/</code>）
+          <span class="sub">人が維持するのは、この指示書1枚とこのページだけです。</span></li>
+      </ul>
+
+      <ul class="blist">
+        <li>Claude は見本をまねて書き、<strong>検証プログラムで自己採点</strong>し、合格（VALID）になるまで直してから完成を報告します。</li>
+        <li>できたフォルダを WordPress の<strong>プラグイン置き場</strong>に入れて有効化すると、「AIアシスタント」画面に現れます。</li>
+      </ul>
+    </section>
+
+    <section id="map" style="--c:#2f6f52">
+      <div class="sec-head"><div class="sec-num">02</div><h2>正本マップ — 何が「真実」か</h2></div>
+      <p class="lead">設計の芯は<strong>「製品のコードが正本。写しは一つも作らない」</strong>です。人が書いた説明書は、製品が変わると<strong>静かに古くなり</strong>、しかも量が多すぎて人の目では照合できません。だから<strong>説明書を持たない</strong>という選択をしています。</p>
+
+      <div class="figbox">
+        <svg class="fig" viewBox="0 0 580 128" role="img" aria-label="製品ZIPが唯一の正本であり、人が書くのは2ページだけであることを示す図">
+          <g font-family="sans-serif">
+            <rect x="10" y="34" width="160" height="56" rx="10" fill="#1d4e79"/>
+            <text x="90" y="58" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">製品の配布 ZIP</text>
+            <text x="90" y="75" font-size="10" fill="#cfdae8" text-anchor="middle">＝唯一の正本（写しゼロ）</text>
+            <path d="M174 62 H206" stroke="#b7bfc9" stroke-width="2"/><path d="M200 57 L211 62 L200 67 Z" fill="#b7bfc9"/>
+            <text x="190" y="52" font-size="9.5" fill="#7e93a6" text-anchor="middle">読むだけ</text>
+            <rect x="216" y="34" width="130" height="56" rx="10" fill="#2f6f52"/>
+            <text x="281" y="58" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Claude</text>
+            <text x="281" y="75" font-size="10" fill="#d3e4d9" text-anchor="middle">中のコードを直接読む</text>
+            <path d="M350 62 H376" stroke="#b7bfc9" stroke-width="2"/><path d="M370 57 L381 62 L370 67 Z" fill="#b7bfc9"/>
+            <rect x="386" y="20" width="184" height="40" rx="10" fill="#eef0f3" stroke="#c9d4df"/>
+            <text x="478" y="37" font-size="11.5" font-weight="700" fill="#3a6285" text-anchor="middle">AI 向け1ページ（規則だけ）</text>
+            <text x="478" y="52" font-size="9.5" fill="#7e93a6" text-anchor="middle">間違えると壊れることのみ</text>
+            <rect x="386" y="66" width="184" height="40" rx="10" fill="#eef0f3" stroke="#c9d4df"/>
+            <text x="478" y="83" font-size="11.5" font-weight="700" fill="#3a6285" text-anchor="middle">人間向け1ページ（このページ）</text>
+            <text x="478" y="98" font-size="9.5" fill="#7e93a6" text-anchor="middle">使い方・渡し方</text>
+          </g>
+        </svg>
+        <div class="fig-cap">Claude は製品 ZIP の中の実物（スキーマ・データの一覧・動作コード）を直接読む。写しが無いので、古くなりようがない。人が維持するのは右の2ページだけ。</div>
+      </div>
+
+      <ul class="blist">
+        <li><strong>製品のコードが常に正しい。</strong> 指示書の記述とコードが食い違ったら、<strong>コードが正しい</strong>。Claude には「勝手に説明に合わせず、食い違いを報告しろ」と指示してあります。</li>
+        <li><strong>ZIP を新しくすれば、それだけで最新になります。</strong> キットを作り直す・写しを更新する、といった作業は<strong>ありません</strong>。</li>
+        <li>使った ZIP がどのバージョンかは、ZIP の中の <code>qahm.php</code> の Version 行と <code>qahm-const.php</code> に書いてあります。</li>
+      </ul>
+    </section>
+
+    <section id="howto" style="--c:#3c6e8f">
+      <div class="sec-head"><div class="sec-num">03</div><h2>Claude への渡し方</h2></div>
+      <ul class="blist">
+        <li>この一式のフォルダを開いて <strong>Claude Code を起動する</strong>（指示書が自動で読み込まれます）。</li>
+        <li><strong>展開した製品 ZIP の場所を伝える</strong>（同じフォルダに置いておけば、それだけで伝わります）。</li>
+        <li>あとは<strong>ふつうの日本語で頼むだけ</strong>。技術用語は不要です。</li>
+      </ul>
+
+      <p style="margin-top:14px"><strong>頼み方の例</strong></p>
+      <pre class="pp">よく見られているページを上位10件、表で見せるアシスタントを作って。
+期間は先月にして。</pre>
+      <pre class="pp">サイトに来た人にアンケートを取りたい。
+質問は3つ（満足度・理由・自由記入）。答えは保存して、あとで一覧できるように。</pre>
+
+      <ul class="blist">
+        <li>Claude は<strong>構成を一度だけ確認</strong>してきます（会話の流れの案）。OK を出すと生成に入ります。</li>
+        <li>完成時、Claude は<strong>検証に合格したこと（VALID）を示します</strong>。示されない場合は「検証は通った？」と聞いてください。</li>
+      </ul>
+    </section>
+
+    <section id="valid" style="--c:#8a6a2f">
+      <div class="sec-head"><div class="sec-num">04</div><h2>「VALID」の意味 — 合格＝正しい、ではありません</h2></div>
+      <p class="lead">ここは知っておいてください。<strong>検証プログラムが見ているのは「壊れていないか」</strong>であって、<strong>「数字が正しいか」ではありません</strong>。</p>
+
+      <ul class="blist">
+        <li><strong>検証されること</strong>：書き方の間違い（存在しない項目名・必須項目の書き忘れ・型の誤り）、<strong>つながりの間違い</strong>（存在しない画面へ飛ぶ指定・使っていない変数・翻訳の書き漏れ・計算式の文法）、<strong>同梱ファイルの形</strong>（余計なファイル・PHP の形・アイコンの形式）。
+          <span class="sub">ここは機械が確実に止めます（検証エンジンは製品本体のもの＝管理画面で読み込むときと同じ判定です）。古い製品 ZIP を渡すと「古い世代」と表示され、このうち「つながり」と「同梱ファイル」は見られません。</span></li>
+        <li><strong>検証されないこと</strong>：<strong>数字が正しいか</strong>。
+          <span class="sub">たとえば「セッション内で何番目に見られたページか」という<strong>順番の番号</strong>を合計して「PV」として表示しても、検証は VALID と言います（実際に見本がこの誤りを持っていて、実データで PV 333 のところを 1,252 と表示していました。2026-07 に修正済み）。</span></li>
+        <li><strong>これも検証されません</strong>：<strong>結果が空っぽにならないか</strong>。
+          <span class="sub">2つのデータを「名前」（流入元の名前など）で突き合わせる書き方をすると、仕組みの都合で<strong>1件も一致せず、空の表や 0 ばかりの数字</strong>が出ることがあります（それでも VALID です）。絞り込みの条件の書き方によっては、<strong>絞り込みが効かないまま全件が表示される</strong>こともあります。「データが無い」ように見えて、実は書き方の問題——ということがあります（→ 下の<a href="#trouble">「動かないときの3チェック」</a>②）。</span></li>
+      </ul>
+
+      <p style="margin-top:10px"><strong>だから、完成したら必ず「実データで数字を見てください」。</strong> 見慣れた画面（QA の管理画面）の数字と桁が合っているか、それだけでも十分な検査になります。おかしければ Claude に「この数字が管理画面と合わない。材料の選び方を実コードで確認して」と伝えてください。<strong>比べるときは、管理画面の期間をアシスタントと同じに合わせてから</strong>——管理画面の初期表示は直近1週間、アシスタントの初期値は直近30日ということがよくあり、そのまま並べると桁が合わないように見えます。</p>
+
+      <p style="margin-top:10px"><strong>もうひとつ、期間を広げたら、数字が減らないことを確かめてください。</strong> 広い期間のほうが小さい——そうなったら、その数字は使えません。そこで止めて相談してください。桁が妥当に見えても、この検査だけが捕まえる壊れ方があります。とくに今日を含む期間（「今週」「今月」）で確かめてください（「過去7日」「過去30日」は昨日までを見るため、この壊れ方が出にくい組み合わせです）。※ 今日を含む期間を選んでも、<strong>今日の分はまだ集計に入っていません</strong>（昨日までの数字になります）＝これは不具合ではありません。</p>
+
+      
+      
+
+      <p style="margin-top:10px;font-size:13px;color:var(--muted)">※ この「数字の正しさを機械で止める」仕組みは、2026-07-15 に一段目が入りました（材料の定義に「この列は順番の番号」といった意味づけ〔semantics 宣言〕が入っています）。この一式の検証ラッパーは、まだこの検査を呼び出しません。</p>
+    </section>
+
+    <section id="trouble" style="--c:#8a4a3c">
+      <div class="sec-head"><div class="sec-num">05</div><h2>動かないときの3チェック</h2></div>
+      <ul class="blist">
+        <li><strong>① 画面に出てこない／エラーになる</strong> → プラグインのフォルダ名と中の名前がずれている可能性。Claude に「フォルダ名と id が一致しているか、検証を通して確認して」と伝えてください。<span class="sub">古いバージョンの製品に、新しい機能を使ったアシスタントを入れた場合もエラーになります（この場合は本体の更新が必要）。</span></li>
+        <li><strong>② 数字が全部ゼロ／表が空</strong> → その期間・そのサイトにデータが無いか、集計の指定が噛み合っていない可能性。Claude に「期間を変えて試して。それでも0なら集計の指定を実コードで確認して」と伝えてください。<span class="sub">それでも空のままなら「データ同士の突き合わせ（join）のキーが数字の ID になっているか、絞り込みの条件が実際に効いているか、実コードで確認して」と伝えてください（名前で突き合わせると1件も一致しない仕組み上の落とし穴があります）。</span></li>
+        <li><strong>③ 文字が「t:xxx」のように出る</strong> → 翻訳の書き漏れです。Claude に「日本語と英語、両方の翻訳が揃っているか確認して」と伝えてください。</li>
+      </ul>
+      <p style="margin-top:12px;font-size:13px;color:var(--muted)">どれも「Claude に何と言えばいいか」の形にしてあります。原因の特定は Claude 側が実コードを読んで行います。</p>
+
+      <p style="margin-top:12px"><strong>検証プログラムが「検証エンジンが壊れています」と言ったとき</strong>は、製品 ZIP を展開し直してください。<span style="color:var(--muted)">（ZIP が壊れていると、検証が「合格」と誤って言ってしまうことがあるため、その状態を検知して止めるようにしています。）</span></p>
+
+      <p style="margin-top:12px;font-size:13px;color:var(--muted)">※ アシスタントの「設定を保存する」機能は、<strong>サイトを1つ選んでいるときだけ</strong>働きます（画面上部で「全サイト表示」を選んでいると保存・読み込みが拒否される仕様です）。設定が保存できないときは、まずサイトの選択を確認してください。</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="div"></div>
+  QA アシスタントの作り方（人間向け）<br>
+  対になる AI 向け指示書は CLAUDE.md
+</footer>
+
+<script>
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#toc a'));
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var sections = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          if (map[e.target.id]) map[e.target.id].classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+    sections.forEach(function (s) { if (s) obs.observe(s); });
+  })();
+</script>
+</body>
+</html>

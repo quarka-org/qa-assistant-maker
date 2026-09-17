@@ -1,0 +1,54 @@
+{
+  "id": "qa-assistant-hitokoto",
+  "version": "1.0.0.0",
+  "icon": "icon.png",
+  "name": "t:meta.name",
+  "description": "t:meta.description",
+
+  "vars": {},
+
+  "data_sources": {},
+
+  "scenes": {
+    "start": [
+      { "message": "t:msg.hello" },
+      { "choices": [
+          { "label": "t:btn.genki", "goto": "genki" },
+          { "label": "t:btn.futsu", "goto": "futsu" },
+          { "label": "t:btn.tsukare", "goto": "tsukare" }
+        ]
+      }
+    ],
+
+    "genki": [
+      { "message": "t:msg.genki" },
+      { "callout": { "level": "good", "text": "t:cal.genki" } },
+      { "goto": "again" }
+    ],
+
+    "futsu": [
+      { "message": "t:msg.futsu" },
+      { "callout": { "level": "info", "text": "t:cal.futsu" } },
+      { "goto": "again" }
+    ],
+
+    "tsukare": [
+      { "message": "t:msg.tsukare" },
+      { "message": "t:msg.tsukare_extra" },
+      { "goto": "again" }
+    ],
+
+    "again": [
+      { "divider": true },
+      { "choices": [
+          { "label": "t:btn.again", "goto": "start", "clear": true },
+          { "label": "t:btn.bye", "goto": "bye" }
+        ]
+      }
+    ],
+
+    "bye": [
+      { "message": "t:msg.bye" }
+    ]
+  }
+}

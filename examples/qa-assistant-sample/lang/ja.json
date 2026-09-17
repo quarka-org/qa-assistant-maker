@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "name": "サンプルアシスタント",
+    "description": "マニフェストランタイムの主要機能・基本シーンの参考実装"
+  },
+  "msg": {
+    "welcome": "こんにちは！**サンプルアシスタント**です。\nサイトのページパフォーマンスを分析します。",
+    "select_period": "分析する期間を選んでください。",
+    "analyzing": "{$period_start} から {$period_end} のデータを取得しています...",
+    "result_summary": "**{$page_count|integer}ページ**を分析しました。\n合計 **{$total_pv|integer} PV**",
+    "select_page": "詳細を見たいページを選んでください。",
+    "detail_title": "**{$selected_title}** の詳細です。",
+    "detail_url": "URL: [{$selected_url}]({$selected_url})",
+    "no_note_yet": "このページにはまだメモがありません。",
+    "has_saved_note": "このページには以前のメモが保存されています (custom_data デモ)。",
+    "note_saved": "メモを保存しました。次回このページを開くと表示されます。",
+    "no_data": "指定された期間にデータが見つかりませんでした。\n別の期間を試してみてください。",
+    "error": "データの取得中にエラーが発生しました。\nしばらく待ってから再度お試しください。",
+    "feedback_intro": "このページについて、簡単な評価をお聞かせください。",
+    "fb_positive": "高い評価をありがとうございます！とても励みになります。",
+    "fb_improve": "ご意見ありがとうございます。改善の参考にさせていただきます。",
+    "fb_saved": "評価を保存しました（custom_data に rotate 付きで履歴保存）。"
+  },
+  "form": {
+    "period": "分析する期間"
+  },
+  "btn": {
+    "analyze": "この期間で分析する",
+    "save_demo_note": "デモメモを保存",
+    "back": "一覧に戻る",
+    "restart": "最初に戻る",
+    "feedback": "このページを評価する",
+    "submit": "送信する"
+  },
+  "tbl": {
+    "pages": "ページ一覧"
+  },
+  "col": {
+    "title": "ページタイトル",
+    "url": "URL",
+    "pv": "PV",
+    "avg_time": "平均滞在時間"
+  },
+  "fb": {
+    "satisfaction": "このページの満足度を教えてください",
+    "sat_5": "とても満足",
+    "sat_4": "満足",
+    "sat_3": "ふつう",
+    "sat_2": "やや不満",
+    "sat_1": "不満",
+    "category": "特に改善してほしい点",
+    "cat_content": "コンテンツ",
+    "cat_design": "デザイン",
+    "cat_speed": "表示速度",
+    "cat_other": "その他",
+    "comment": "コメント（任意）",
+    "comment_ph": "自由にご記入ください"
+  },
+  "chart": {
+    "pv_by_page": "ページ別 閲覧数"
+  }
+}

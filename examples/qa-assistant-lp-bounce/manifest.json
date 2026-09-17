@@ -1,0 +1,304 @@
+{
+  "id": "qa-assistant-lp-bounce",
+  "version": "1.0.0.0",
+  "icon": "icon.png",
+  "name": "t:meta.name",
+  "description": "t:meta.description",
+  "min_core_version": "2.13.0",
+
+  "vars": {
+    "period": "",
+    "period_start": "",
+    "period_end": "",
+    "min_sessions": "10",
+    "site_rows": [],
+    "site_sessions": 0,
+    "site_bounces": 0,
+    "site_bounce_rate": 0,
+    "lp_data": [],
+    "page_count": 0,
+    "high_count": 0,
+    "mid_count": 0,
+    "low_count": 0,
+    "worst_title": "",
+    "worst_rate": 0,
+    "selected_title": "",
+    "selected_url": "",
+    "selected_rate": 0,
+    "selected_sessions": 0,
+    "selected_bounces": 0,
+    "selected_share": 0
+  },
+
+  "data_sources": {
+    "site_total": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "summary_landingpage" }],
+        "time": {
+          "start": "$period_start",
+          "end": "$period_end",
+          "tz": "$sys.tz"
+        },
+        "make": {
+          "totals": {
+            "from": ["summary_landingpage"],
+            "keep": [],
+            "calc": {
+              "sessions": "SUM(summary_landingpage.session_count)",
+              "bounces": "SUM(summary_landingpage.bounce_count)"
+            },
+            "add": ["sessions", "bounces"]
+          }
+        },
+        "result": { "use": "totals", "limit": 1 }
+      },
+      "into": "site_rows",
+      "transform": [
+        { "set_var": "site_sessions", "expr": "first(sessions)" },
+        { "set_var": "site_bounces", "expr": "first(bounces)" },
+        { "set_var": "site_bounce_rate", "expr": "$site_bounces / $site_sessions * 100" }
+      ]
+    },
+
+    "landing_pages": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "summary_landingpage" }],
+        "time": {
+          "start": "$period_start",
+          "end": "$period_end",
+          "tz": "$sys.tz"
+        },
+        "make": {
+          "pages": {
+            "from": ["summary_landingpage"],
+            "keep": [
+              "summary_landingpage.page_id",
+              "summary_landingpage.title",
+              "summary_landingpage.url"
+            ],
+            "calc": {
+              "sessions": "SUM(summary_landingpage.session_count)",
+              "bounces": "SUM(summary_landingpage.bounce_count)",
+              "pv": "SUM(summary_landingpage.pv_count)"
+            },
+            "add": ["sessions", "bounces", "pv"],
+            "sort": { "by": "sessions", "order": "desc" }
+          }
+        },
+        "result": { "use": "pages", "limit": 1000 }
+      },
+      "into": "lp_data",
+      "transform": [
+        { "filter": { "sessions": { "gte": "$min_sessions" } } },
+        { "set_var": "page_count", "expr": "count(sessions)" },
+        { "calc": "bounce_rate", "expr": "bounces / sessions * 100", "scope": "row" },
+        { "calc": "session_share", "expr": "sessions / $site_sessions * 100", "scope": "row" },
+        { "tally": { "buckets": [
+            { "into": "high_count", "count": true, "when": { "bounce_rate": { "gte": 70 } } },
+            { "into": "mid_count",  "count": true, "when": { "bounce_rate": { "gte": 40, "lt": 70 } } },
+            { "into": "low_count",  "count": true, "when": { "bounce_rate": { "lt": 40 } } }
+          ] } },
+        { "sort": { "bounce_rate": "desc" } },
+        { "limit": 20 },
+        { "set_var": "worst_title", "expr": "first(title)" },
+        { "set_var": "worst_rate", "expr": "first(bounce_rate)" }
+      ]
+    }
+  },
+
+  "scorecards": {
+    "site_cards": {
+      "title": "t:sc.title",
+      "cards": [
+        { "label": "t:sc.sessions",    "value": "{$site_sessions|integer}",     "unit": "t:unit.sessions" },
+        { "label": "t:sc.bounce_rate", "value": "{$site_bounce_rate|percentage}", "sub": "t:sc.bounce_rate_sub" },
+        { "label": "t:sc.high",        "value": "{$high_count|integer}",        "unit": "t:unit.pages", "level": "bad" },
+        { "label": "t:sc.checked",     "value": "{$page_count|integer}",        "unit": "t:unit.pages" }
+      ]
+    }
+  },
+
+  "tables": {
+    "lp_table": {
+      "title": "t:tbl.lp",
+      "source": "$lp_data",
+      "columns": [
+        { "key": "page_id",       "label": "t:col.page_id", "type": "string", "hidden": true },
+        { "key": "title",         "label": "t:col.title",   "type": "string" },
+        { "key": "url",           "label": "t:col.url",     "type": "link" },
+        { "key": "sessions",      "label": "t:col.sessions", "type": "integer" },
+        { "key": "bounces",       "label": "t:col.bounces",  "type": "integer" },
+        { "key": "bounce_rate",   "label": "t:col.bounce_rate", "type": "percentage",
+          "color_thresholds": [
+            { "op": "gte", "value": 70, "level": "bad" },
+            { "op": "gte", "value": 40, "level": "mid" },
+            { "op": "lt",  "value": 40, "level": "good" }
+          ] },
+        { "key": "session_share", "label": "t:col.session_share", "type": "percentage" }
+      ],
+      "initial_sort": { "column": "bounce_rate", "direction": "desc" }
+    }
+  },
+
+  "charts": {
+    "bounce_chart": {
+      "title": "t:chart.bounce",
+      "source": "$lp_data",
+      "type": "hbar",
+      "x": "title",
+      "series": [
+        { "field": "bounce_rate", "label": "t:col.bounce_rate" }
+      ]
+    }
+  },
+
+  "scenes": {
+    "start": [
+      { "message": "t:msg.welcome" },
+      { "message": "t:msg.ask_period" },
+      { "form": {
+          "fields": [
+            { "key": "period", "type": "date_range", "label": "t:form.period", "default": "last_30_days" },
+            { "key": "min_sessions", "type": "select", "label": "t:form.min_sessions", "default": "10", "options": [
+              { "value": "1",   "label": "t:form.min_1" },
+              { "value": "10",  "label": "t:form.min_10" },
+              { "value": "30",  "label": "t:form.min_30" },
+              { "value": "100", "label": "t:form.min_100" }
+            ]}
+          ],
+          "submit": "t:btn.analyze"
+      }},
+      { "goto": "analyze" }
+    ],
+
+    "analyze": [
+      { "message": "t:msg.analyzing" },
+      { "fetch": "site_total", "on_error": "error" },
+      { "if": { "var": "site_sessions", "is": "lte", "value": 0 }, "then": { "goto": "no_data" } },
+      { "fetch": "landing_pages", "on_error": "error" },
+      { "if": { "var": "lp_data", "is": "empty" }, "then": { "goto": "no_match" } },
+      { "goto": "report" }
+    ],
+
+    "report": [
+      { "message": "t:msg.result_head" },
+      { "scorecard": "site_cards" },
+      { "divider": true },
+      { "if": { "var": "site_bounce_rate", "is": "gte", "value": 70 }, "then": { "goto": "verdict_bad" } },
+      { "if": { "var": "site_bounce_rate", "is": "gte", "value": 40 },
+        "then": { "goto": "verdict_mid" },
+        "else": { "goto": "verdict_good" } }
+    ],
+
+    "verdict_bad": [
+      { "callout": { "title": "t:cal.site_title", "text": "t:cal.site_bad", "level": "bad" } },
+      { "goto": "report_body" }
+    ],
+
+    "verdict_mid": [
+      { "callout": { "title": "t:cal.site_title", "text": "t:cal.site_mid", "level": "mid" } },
+      { "goto": "report_body" }
+    ],
+
+    "verdict_good": [
+      { "callout": { "title": "t:cal.site_title", "text": "t:cal.site_good", "level": "good" } },
+      { "goto": "report_body" }
+    ],
+
+    "report_body": [
+      { "message": "t:msg.table_intro" },
+      { "table": "lp_table",
+        "row_action": {
+          "goto": "detail",
+          "label_field": "title",
+          "set": {
+            "selected_title": "$row.title",
+            "selected_url": "$row.url",
+            "selected_rate": "$row.bounce_rate",
+            "selected_sessions": "$row.sessions",
+            "selected_bounces": "$row.bounces",
+            "selected_share": "$row.session_share"
+          }
+        }
+      },
+      { "chart": "bounce_chart" },
+      { "message": "t:msg.pick_row" },
+      { "choices": [
+          { "label": "t:btn.redo", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "detail": [
+      { "message": "t:msg.detail_head" },
+      { "callout": { "text": "t:cal.detail_numbers", "level": "info" } },
+      { "if": { "all": [
+            { "var": "selected_rate", "is": "gte", "value": 70 },
+            { "var": "selected_sessions", "is": "gte", "value": 30 }
+          ] },
+        "then": { "goto": "advice_urgent" } },
+      { "if": { "var": "selected_rate", "is": "gte", "value": 70 }, "then": { "goto": "advice_bad" } },
+      { "if": { "var": "selected_rate", "is": "gte", "value": 40 },
+        "then": { "goto": "advice_mid" },
+        "else": { "goto": "advice_good" } }
+    ],
+
+    "advice_urgent": [
+      { "callout": { "title": "t:adv.urgent_title", "text": "t:adv.urgent", "level": "bad" } },
+      { "goto": "detail_tail" }
+    ],
+
+    "advice_bad": [
+      { "callout": { "title": "t:adv.bad_title", "text": "t:adv.bad", "level": "bad" } },
+      { "goto": "detail_tail" }
+    ],
+
+    "advice_mid": [
+      { "callout": { "title": "t:adv.mid_title", "text": "t:adv.mid", "level": "mid" } },
+      { "goto": "detail_tail" }
+    ],
+
+    "advice_good": [
+      { "callout": { "title": "t:adv.good_title", "text": "t:adv.good", "level": "good" } },
+      { "goto": "detail_tail" }
+    ],
+
+    "detail_tail": [
+      { "divider": true },
+      { "message": "t:msg.next" },
+      { "choices": [
+          { "label": "t:btn.back", "goto": "report_body" },
+          { "label": "t:btn.redo", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "no_data": [
+      { "message": "t:msg.no_data" },
+      { "choices": [
+          { "label": "t:btn.redo", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "no_match": [
+      { "message": "t:msg.no_match" },
+      { "choices": [
+          { "label": "t:btn.redo", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "error": [
+      { "message": "t:msg.error" },
+      { "choices": [
+          { "label": "t:btn.redo", "goto": "start", "clear": true }
+        ]
+      }
+    ]
+  }
+}

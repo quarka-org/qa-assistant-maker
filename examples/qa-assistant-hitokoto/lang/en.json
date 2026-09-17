@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "name": "A Word for Today",
+    "description": "Press a button and it says one thing back. That is all it does"
+  },
+  "msg": {
+    "hello": "Good to see you.\n**How are you doing today?**",
+    "genki": "Nice. Keep going.",
+    "futsu": "Ordinary days are the ones you can keep having.",
+    "tsukare": "Fair enough. This is far enough for today.",
+    "tsukare_extra": ":::callout{level=good}\nThe numbers will still be in the same place tomorrow. **Rest first.**\n:::",
+    "bye": "See you tomorrow."
+  },
+  "cal": {
+    "genki": "While you are here, look at **just one page** you have been wondering about. Tomorrow's you will be glad.",
+    "futsu": "On an ordinary day, the trick is **not to start anything new**."
+  },
+  "btn": {
+    "genki": "Good",
+    "futsu": "So-so",
+    "tsukare": "Tired",
+    "again": "Again",
+    "bye": "Done"
+  }
+}

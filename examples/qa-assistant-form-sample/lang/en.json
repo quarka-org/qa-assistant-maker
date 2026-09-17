@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Feedback Collector Assistant",
+    "description": "Sample of a form-only assistant with no data sources (empty data_sources). It asks a few questions and saves the result."
+  },
+  "msg": {
+    "welcome":  "Hello! I'm the **Feedback Collector Assistant**.\nThis assistant uses no analytics data — it works entirely through an input form.",
+    "positive": "Thank you for the great rating! It really motivates us.",
+    "improve":  "Thank you for your feedback. We'll use it to improve.",
+    "saved":    "Your feedback has been saved. Thank you!",
+    "error":    "An error occurred while saving.\nPlease wait a moment and try again."
+  },
+  "form": {
+    "satisfaction": "How satisfied are you with this site?",
+    "sat_5":   "Very satisfied",
+    "sat_4":   "Satisfied",
+    "sat_3":   "Neutral",
+    "sat_2":   "Somewhat dissatisfied",
+    "sat_1":   "Dissatisfied",
+    "note":    "Comments (optional)",
+    "note_ph": "Feel free to write anything"
+  },
+  "btn": {
+    "submit":  "Submit",
+    "restart": "Start over"
+  }
+}

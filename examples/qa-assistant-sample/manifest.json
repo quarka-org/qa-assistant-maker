@@ -1,0 +1,249 @@
+{
+  "id": "qa-assistant-sample",
+  "version": "2.4.0.0",
+  "icon": "icon.png",
+  "name": "t:meta.name",
+  "description": "t:meta.description",
+
+  "permissions": {
+    "config_read":  ["page_notes"],
+    "config_write": ["page_notes", "page_feedback"]
+  },
+
+  "vars": {
+    "period": "",
+    "period_start": "",
+    "period_end": "",
+    "page_data": [],
+    "selected_url": "",
+    "selected_title": "",
+    "total_pv": 0,
+    "page_count": 0,
+    "saved_note": "",
+    "fb_satisfaction": "",
+    "fb_category": "",
+    "fb_comment": "",
+    "fb_result": ""
+  },
+
+  "data_sources": {
+    "pages": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "summary_allpage" }],
+        "time": {
+          "start": "$period_start",
+          "end": "$period_end",
+          "tz": "$sys.tz"
+        },
+        "make": {
+          "pages": {
+            "from": ["summary_allpage"],
+            "keep": [
+              "summary_allpage.page_id",
+              "summary_allpage.title",
+              "summary_allpage.url"
+            ],
+            "calc": {
+              "pv_count": "SUM(summary_allpage.pv_count)",
+              "time_on_page": "SUM(summary_allpage.time_on_page)"
+            },
+            "add": ["pv_count", "time_on_page"],
+            "sort": { "by": "pv_count", "order": "desc" }
+          }
+        },
+        "result": { "use": "pages", "limit": 1000 }
+      },
+      "into": "page_data",
+      "transform": [
+        { "calc": "avg_time_on_page", "expr": "time_on_page / pv_count", "scope": "row" },
+        { "set_var": "total_pv", "expr": "sum(pv_count)" },
+        { "set_var": "page_count", "expr": "count(pv_count)" },
+        { "sort": { "pv_count": "desc" } },
+        { "limit": 20 }
+      ]
+    }
+  },
+
+  "tables": {
+    "page_summary": {
+      "title": "t:tbl.pages",
+      "source": "$page_data",
+      "columns": [
+        { "key": "title",            "label": "t:col.title",    "type": "string" },
+        { "key": "url",              "label": "t:col.url",      "type": "link" },
+        { "key": "pv_count",         "label": "t:col.pv",       "type": "integer" },
+        { "key": "avg_time_on_page", "label": "t:col.avg_time", "type": "duration" }
+      ],
+      "initial_sort": { "column": "pv_count", "direction": "desc" }
+    }
+  },
+
+  "charts": {
+    "pv_by_page": {
+      "title": "t:chart.pv_by_page",
+      "source": "$page_data",
+      "type": "hbar",
+      "x": "title",
+      "series": [
+        { "field": "pv_count", "label": "t:col.pv" }
+      ]
+    }
+  },
+
+  "scenes": {
+    "start": [
+      { "message": "t:msg.welcome" },
+      { "message": "t:msg.select_period" },
+      { "form": {
+          "fields": [
+            { "key": "period", "type": "date_range", "label": "t:form.period", "default": "last_30_days" }
+          ],
+          "submit": "t:btn.analyze"
+      }},
+      { "goto": "analyze" }
+    ],
+
+    "analyze": [
+      { "message": "t:msg.analyzing" },
+      { "fetch": "pages", "on_error": "error" },
+      { "if": { "var": "page_data", "is": "empty" }, "then": { "goto": "no_data" } },
+      { "message": "t:msg.result_summary" },
+      { "table": "page_summary" },
+      { "chart": "pv_by_page" },
+      { "message": "t:msg.select_page" },
+      { "choices": {
+          "from_data": "$page_data",
+          "label_field": "title",
+          "maxItems": 10,
+          "goto": "detail",
+          "set": { "selected_url": "$row.url", "selected_title": "$row.title" },
+          "extra": [
+            { "label": "t:btn.restart", "goto": "start", "clear": true }
+          ]
+        }
+      }
+    ],
+
+    "detail": [
+      { "message": "t:msg.detail_title" },
+      { "message": "t:msg.detail_url" },
+      { "config_read": {
+          "category": "custom_data",
+          "store": "page_notes",
+          "key": "$selected_url",
+          "into": "saved_note"
+      }},
+      { "if": { "var": "saved_note", "is": "not_empty" },
+        "then": { "goto": "show_note" } },
+      { "message": "t:msg.no_note_yet" },
+      { "choices": [
+          { "label": "t:btn.save_demo_note", "goto": "save_note" },
+          { "label": "t:btn.feedback", "goto": "feedback" },
+          { "label": "t:btn.back", "goto": "analyze" },
+          { "label": "t:btn.restart", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "show_note": [
+      { "message": "t:msg.has_saved_note" },
+      { "choices": [
+          { "label": "t:btn.save_demo_note", "goto": "save_note" },
+          { "label": "t:btn.feedback", "goto": "feedback" },
+          { "label": "t:btn.back", "goto": "analyze" },
+          { "label": "t:btn.restart", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "save_note": [
+      { "config_write": {
+          "category": "custom_data",
+          "store": "page_notes",
+          "key": "$selected_url",
+          "value": { "note": "Visited via sample assistant", "title": "$selected_title" }
+      }},
+      { "message": "t:msg.note_saved" },
+      { "choices": [
+          { "label": "t:btn.back", "goto": "analyze" },
+          { "label": "t:btn.restart", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "feedback": [
+      { "message": "t:msg.feedback_intro" },
+      { "form": {
+          "fields": [
+            { "key": "fb_satisfaction", "type": "radio", "label": "t:fb.satisfaction", "required": true, "options": [
+              { "value": "5", "label": "t:fb.sat_5" },
+              { "value": "4", "label": "t:fb.sat_4" },
+              { "value": "3", "label": "t:fb.sat_3" },
+              { "value": "2", "label": "t:fb.sat_2" },
+              { "value": "1", "label": "t:fb.sat_1" }
+            ]},
+            { "key": "fb_category", "type": "select", "label": "t:fb.category", "options": [
+              { "value": "content", "label": "t:fb.cat_content" },
+              { "value": "design",  "label": "t:fb.cat_design" },
+              { "value": "speed",   "label": "t:fb.cat_speed" },
+              { "value": "other",   "label": "t:fb.cat_other" }
+            ]},
+            { "key": "fb_comment", "type": "textarea", "label": "t:fb.comment", "placeholder": "t:fb.comment_ph" }
+          ],
+          "submit": "t:btn.submit"
+      }},
+      { "goto": "eval_feedback" }
+    ],
+
+    "eval_feedback": [
+      { "if": { "var": "fb_satisfaction", "is": "gte", "value": 4 }, "then": { "goto": "feedback_positive" } },
+      { "goto": "feedback_improve" }
+    ],
+
+    "feedback_positive": [
+      { "message": "t:msg.fb_positive" },
+      { "goto": "save_feedback" }
+    ],
+
+    "feedback_improve": [
+      { "message": "t:msg.fb_improve" },
+      { "goto": "save_feedback" }
+    ],
+
+    "save_feedback": [
+      { "config_write": {
+          "category": "custom_data",
+          "store": "page_feedback",
+          "key": "$selected_url",
+          "value": { "satisfaction": "$fb_satisfaction", "category": "$fb_category", "comment": "$fb_comment", "title": "$selected_title" },
+          "rotate": { "max_entries": 100, "strategy": "oldest" },
+          "into": "fb_result",
+          "on_error": "error"
+      }},
+      { "message": "t:msg.fb_saved" },
+      { "choices": [
+          { "label": "t:btn.back", "goto": "analyze" },
+          { "label": "t:btn.restart", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "no_data": [
+      { "message": "t:msg.no_data" },
+      { "choices": [
+          { "label": "t:btn.restart", "goto": "start", "clear": true }
+        ]
+      }
+    ],
+
+    "error": [
+      { "message": "t:msg.error" },
+      { "choices": [
+          { "label": "t:btn.restart", "goto": "start", "clear": true }
+        ]
+      }
+    ]
+  }
+}

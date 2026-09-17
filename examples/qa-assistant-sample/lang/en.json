@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "name": "Sample Assistant",
+    "description": "Primary feature & basic-scene reference for manifest runtime"
+  },
+  "msg": {
+    "welcome": "Hello! I'm the **Sample Assistant**.\nI'll analyze your site's page performance.",
+    "select_period": "Choose a time period to analyze.",
+    "analyzing": "Fetching data from {$period_start} to {$period_end}...",
+    "result_summary": "Analyzed **{$page_count|integer} pages**.\nTotal **{$total_pv|integer} PV**",
+    "select_page": "Select a page for details.",
+    "detail_title": "Details for **{$selected_title}**",
+    "detail_url": "URL: [{$selected_url}]({$selected_url})",
+    "no_note_yet": "No note saved for this page yet.",
+    "has_saved_note": "A note from a previous visit is saved for this page (custom_data demo).",
+    "note_saved": "Note saved. It will be shown next time you visit this page.",
+    "no_data": "No data found for the selected period.\nPlease try a different period.",
+    "error": "An error occurred while fetching data.\nPlease wait and try again.",
+    "feedback_intro": "Please share a quick rating of this page.",
+    "fb_positive": "Thank you for the high rating! It really motivates us.",
+    "fb_improve": "Thank you for your feedback. We'll use it to improve.",
+    "fb_saved": "Your rating has been saved (stored in custom_data with rotation)."
+  },
+  "form": {
+    "period": "Period to analyze"
+  },
+  "btn": {
+    "analyze": "Analyze this period",
+    "save_demo_note": "Save demo note",
+    "back": "Back to list",
+    "restart": "Start over",
+    "feedback": "Rate this page",
+    "submit": "Submit"
+  },
+  "tbl": {
+    "pages": "Page List"
+  },
+  "col": {
+    "title": "Page Title",
+    "url": "URL",
+    "pv": "PV",
+    "avg_time": "Avg. Time"
+  },
+  "fb": {
+    "satisfaction": "How satisfied are you with this page?",
+    "sat_5": "Very satisfied",
+    "sat_4": "Satisfied",
+    "sat_3": "Neutral",
+    "sat_2": "Somewhat dissatisfied",
+    "sat_1": "Dissatisfied",
+    "category": "What should we improve most?",
+    "cat_content": "Content",
+    "cat_design": "Design",
+    "cat_speed": "Speed",
+    "cat_other": "Other",
+    "comment": "Comment (optional)",
+    "comment_ph": "Feel free to write anything"
+  },
+  "chart": {
+    "pv_by_page": "PV by Page"
+  }
+}
