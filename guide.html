@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="QA アシスタントの作り方（人間向け）。渡すもの／正本マップ／Claude への渡し方／VALID の意味／動かないときの3チェック。">
+<meta name="description" content="QA アシスタントの作り方（人間向け）。渡すもの／正本マップ／AI への渡し方／VALID の意味／動かないときの3チェック。">
 <title>QA アシスタントの作り方 — 使い方</title>
 <style>
 :root{
@@ -126,9 +126,9 @@ th, td{line-height:1.7}
   <div class="hero-inner">
     <div class="kicker"><span class="dot"></span>QA ASSISTANT ／ 使い方</div>
     <h1>QA アシスタントの作り方</h1>
-    <div class="tagline">製品の ZIP と、この一式を Claude に渡すと、QA Assistants / QA ZERO の「AIアシスタント」画面で動くアシスタントを1本作ってくれます。人が読むのはこのページだけで足りるように作ってあります。</div>
+    <div class="tagline">製品のコードと、この一式を AI に渡すと、QA Assistants / QA ZERO の「AIアシスタント」画面で動くアシスタントを1本作ってくれます。人が読むのはこのページだけで足りるように作ってあります。</div>
     <div class="meta">
-      <span><b>渡すもの</b> 製品 ZIP ＋ この一式</span>
+      <span><b>渡すもの</b> 製品のコード ＋ この一式</span>
       <span><b>使う人</b> どなたでも（コードの知識は不要）</span>
     </div>
   </div>
@@ -139,7 +139,7 @@ th, td{line-height:1.7}
     <h3>もくじ</h3>
     <a href="#what"><span class="n">01</span>これは何か</a>
     <a href="#map"><span class="n">02</span>正本マップ（何が真実か）</a>
-    <a href="#howto"><span class="n">03</span>Claude への渡し方</a>
+    <a href="#howto"><span class="n">03</span>AI への渡し方</a>
     <a href="#valid"><span class="n">04</span>「VALID」の意味</a>
     <a href="#trouble"><span class="n">05</span>動かないときの3チェック</a>
   </nav>
@@ -148,18 +148,18 @@ th, td{line-height:1.7}
 
     <section id="what" style="--c:#1d4e79">
       <div class="sec-head"><div class="sec-num">01</div><h2>これは何か</h2></div>
-      <p class="lead">アシスタントは、<strong>4つのファイル（動作定義・翻訳2つ・プラグインの入り口）＋アイコン</strong>でできています。これを手で書くのは大変なので、<strong>Claude に書かせる</strong>ための道具立てがこの一式です。</p>
+      <p class="lead">アシスタントは、<strong>4つのファイル（動作定義・翻訳2つ・プラグインの入り口）＋アイコン</strong>でできています。これを手で書くのは大変なので、<strong>AI に書かせる</strong>ための道具立てがこの一式です。</p>
 
       <h3>渡すもの（2つだけ）</h3>
       <ul class="blist">
-        <li><strong>製品の配布 ZIP を展開したフォルダ</strong>（<code>qa-heatmap-analytics/</code> か <code>qa-zero/</code>）
+        <li><strong>製品のコードのフォルダ</strong>（<code>qa-heatmap-analytics/</code> か <code>qa-zero/</code>）
           <span class="sub">製品としてお使いのものと同じ、ふつうのプラグイン ZIP です。この中に、アシスタントの仕組み・取れるデータの一覧・検証プログラムが<strong>全部入っています</strong>。特別な準備は要りません。</span></li>
         <li><strong>この一式</strong>（指示書 <code>CLAUDE.md</code>・検証ラッパー <code>validate.php</code>・見本 <code>examples/</code>）
           <span class="sub">人が維持するのは、この指示書1枚とこのページだけです。</span></li>
       </ul>
 
       <ul class="blist">
-        <li>Claude は見本をまねて書き、<strong>検証プログラムで自己採点</strong>し、合格（VALID）になるまで直してから完成を報告します。</li>
+        <li>AI は見本をまねて書き、<strong>検証プログラムで自己採点</strong>し、合格（VALID）になるまで直してから完成を報告します。</li>
         <li>できたフォルダを WordPress の<strong>プラグイン置き場</strong>に入れて有効化すると、「AIアシスタント」画面に現れます。</li>
       </ul>
     </section>
@@ -177,7 +177,7 @@ th, td{line-height:1.7}
             <path d="M174 62 H206" stroke="#b7bfc9" stroke-width="2"/><path d="M200 57 L211 62 L200 67 Z" fill="#b7bfc9"/>
             <text x="190" y="52" font-size="9.5" fill="#7e93a6" text-anchor="middle">読むだけ</text>
             <rect x="216" y="34" width="130" height="56" rx="10" fill="#2f6f52"/>
-            <text x="281" y="58" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Claude</text>
+            <text x="281" y="58" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">AI</text>
             <text x="281" y="75" font-size="10" fill="#d3e4d9" text-anchor="middle">中のコードを直接読む</text>
             <path d="M350 62 H376" stroke="#b7bfc9" stroke-width="2"/><path d="M370 57 L381 62 L370 67 Z" fill="#b7bfc9"/>
             <rect x="386" y="20" width="184" height="40" rx="10" fill="#eef0f3" stroke="#c9d4df"/>
@@ -188,21 +188,22 @@ th, td{line-height:1.7}
             <text x="478" y="98" font-size="9.5" fill="#7e93a6" text-anchor="middle">使い方・渡し方</text>
           </g>
         </svg>
-        <div class="fig-cap">Claude は製品 ZIP の中の実物（スキーマ・データの一覧・動作コード）を直接読む。写しが無いので、古くなりようがない。人が維持するのは右の2ページだけ。</div>
+        <div class="fig-cap">AI は製品のコードの中の実物（スキーマ・データの一覧・動作コード）を直接読む。写しが無いので、古くなりようがない。人が維持するのは右の2ページだけ。</div>
       </div>
 
       <ul class="blist">
-        <li><strong>製品のコードが常に正しい。</strong> 指示書の記述とコードが食い違ったら、<strong>コードが正しい</strong>。Claude には「勝手に説明に合わせず、食い違いを報告しろ」と指示してあります。</li>
+        <li><strong>製品のコードが常に正しい。</strong> 指示書の記述とコードが食い違ったら、<strong>コードが正しい</strong>。AI には「勝手に説明に合わせず、食い違いを報告しろ」と指示してあります。</li>
         <li><strong>ZIP を新しくすれば、それだけで最新になります。</strong> キットを作り直す・写しを更新する、といった作業は<strong>ありません</strong>。</li>
         <li>使った ZIP がどのバージョンかは、ZIP の中の <code>qahm.php</code> の Version 行と <code>qahm-const.php</code> に書いてあります。</li>
       </ul>
     </section>
 
     <section id="howto" style="--c:#3c6e8f">
-      <div class="sec-head"><div class="sec-num">03</div><h2>Claude への渡し方</h2></div>
+      <div class="sec-head"><div class="sec-num">03</div><h2>AI への渡し方</h2></div>
+      <p class="lead"><strong>要件はこれだけです。</strong> 使う AI は、<strong>Claude Code のように、フォルダ内のファイルを読んで検証コマンドを走らせられる AI</strong> を想定しています（<strong>動作確認済みは Claude Code</strong>）。コマンドを実行できない AI でも作れます——その場合、<strong>検証の1行だけ人が打ってください</strong>。手元には <strong>製品のコードのフォルダ</strong>（配布 ZIP を展開したもの、または自分のサイトに入れてあるプラグインのフォルダをそのままコピーしたもの）と <strong>PHP 7.4 以上</strong>が要ります。<strong>サイトに入れてある版と同じもの</strong>を置いてください。</p>
       <ul class="blist">
-        <li>この一式のフォルダを開いて <strong>Claude Code を起動する</strong>（指示書が自動で読み込まれます）。</li>
-        <li><strong>展開した製品 ZIP の場所を伝える</strong>（同じフォルダに置いておけば、それだけで伝わります）。</li>
+        <li>この一式のフォルダを開いて <strong>AI エージェントを起動する</strong>（指示書 <code>CLAUDE.md</code> が自動で読み込まれます）。</li>
+        <li><strong>製品のコードのフォルダの場所を伝える</strong>（同じフォルダに置いておけば、それだけで伝わります）。</li>
         <li>あとは<strong>ふつうの日本語で頼むだけ</strong>。技術用語は不要です。</li>
       </ul>
 
@@ -213,8 +214,8 @@ th, td{line-height:1.7}
 質問は3つ（満足度・理由・自由記入）。答えは保存して、あとで一覧できるように。</pre>
 
       <ul class="blist">
-        <li>Claude は<strong>構成を一度だけ確認</strong>してきます（会話の流れの案）。OK を出すと生成に入ります。</li>
-        <li>完成時、Claude は<strong>検証に合格したこと（VALID）を示します</strong>。示されない場合は「検証は通った？」と聞いてください。</li>
+        <li>AI は<strong>構成を一度だけ確認</strong>してきます（会話の流れの案）。OK を出すと生成に入ります。</li>
+        <li>完成時、AI は<strong>検証に合格したこと（VALID）を示します</strong>。示されない場合は「検証は通った？」と聞いてください。</li>
       </ul>
     </section>
 
@@ -231,7 +232,7 @@ th, td{line-height:1.7}
           <span class="sub">2つのデータを「名前」（流入元の名前など）で突き合わせる書き方をすると、仕組みの都合で<strong>1件も一致せず、空の表や 0 ばかりの数字</strong>が出ることがあります（それでも VALID です）。絞り込みの条件の書き方によっては、<strong>絞り込みが効かないまま全件が表示される</strong>こともあります。「データが無い」ように見えて、実は書き方の問題——ということがあります（→ 下の<a href="#trouble">「動かないときの3チェック」</a>②）。</span></li>
       </ul>
 
-      <p style="margin-top:10px"><strong>だから、完成したら必ず「実データで数字を見てください」。</strong> 見慣れた画面（QA の管理画面）の数字と桁が合っているか、それだけでも十分な検査になります。おかしければ Claude に「この数字が管理画面と合わない。材料の選び方を実コードで確認して」と伝えてください。<strong>比べるときは、管理画面の期間をアシスタントと同じに合わせてから</strong>——管理画面の初期表示は直近1週間、アシスタントの初期値は直近30日ということがよくあり、そのまま並べると桁が合わないように見えます。</p>
+      <p style="margin-top:10px"><strong>だから、完成したら必ず「実データで数字を見てください」。</strong> 見慣れた画面（QA の管理画面）の数字と桁が合っているか、それだけでも十分な検査になります。おかしければ AI に「この数字が管理画面と合わない。材料の選び方を実コードで確認して」と伝えてください。<strong>比べるときは、管理画面の期間をアシスタントと同じに合わせてから</strong>——管理画面の初期表示は直近1週間、アシスタントの初期値は直近30日ということがよくあり、そのまま並べると桁が合わないように見えます。</p>
 
       <p style="margin-top:10px"><strong>もうひとつ、期間を広げたら、数字が減らないことを確かめてください。</strong> 広い期間のほうが小さい——そうなったら、その数字は使えません。そこで止めて相談してください。桁が妥当に見えても、この検査だけが捕まえる壊れ方があります。とくに今日を含む期間（「今週」「今月」）で確かめてください（「過去7日」「過去30日」は昨日までを見るため、この壊れ方が出にくい組み合わせです）。※ 今日を含む期間を選んでも、<strong>今日の分はまだ集計に入っていません</strong>（昨日までの数字になります）＝これは不具合ではありません。</p>
 
@@ -244,11 +245,11 @@ th, td{line-height:1.7}
     <section id="trouble" style="--c:#8a4a3c">
       <div class="sec-head"><div class="sec-num">05</div><h2>動かないときの3チェック</h2></div>
       <ul class="blist">
-        <li><strong>① 画面に出てこない／エラーになる</strong> → プラグインのフォルダ名と中の名前がずれている可能性。Claude に「フォルダ名と id が一致しているか、検証を通して確認して」と伝えてください。<span class="sub">古いバージョンの製品に、新しい機能を使ったアシスタントを入れた場合もエラーになります（この場合は本体の更新が必要）。</span></li>
-        <li><strong>② 数字が全部ゼロ／表が空</strong> → その期間・そのサイトにデータが無いか、集計の指定が噛み合っていない可能性。Claude に「期間を変えて試して。それでも0なら集計の指定を実コードで確認して」と伝えてください。<span class="sub">それでも空のままなら「データ同士の突き合わせ（join）のキーが数字の ID になっているか、絞り込みの条件が実際に効いているか、実コードで確認して」と伝えてください（名前で突き合わせると1件も一致しない仕組み上の落とし穴があります）。</span></li>
-        <li><strong>③ 文字が「t:xxx」のように出る</strong> → 翻訳の書き漏れです。Claude に「日本語と英語、両方の翻訳が揃っているか確認して」と伝えてください。</li>
+        <li><strong>① 画面に出てこない／エラーになる</strong> → プラグインのフォルダ名と中の名前がずれている可能性。AI に「フォルダ名と id が一致しているか、検証を通して確認して」と伝えてください。<span class="sub">古いバージョンの製品に、新しい機能を使ったアシスタントを入れた場合もエラーになります（この場合は本体の更新が必要）。</span></li>
+        <li><strong>② 数字が全部ゼロ／表が空</strong> → その期間・そのサイトにデータが無いか、集計の指定が噛み合っていない可能性。AI に「期間を変えて試して。それでも0なら集計の指定を実コードで確認して」と伝えてください。<span class="sub">それでも空のままなら「データ同士の突き合わせ（join）のキーが数字の ID になっているか、絞り込みの条件が実際に効いているか、実コードで確認して」と伝えてください（名前で突き合わせると1件も一致しない仕組み上の落とし穴があります）。</span></li>
+        <li><strong>③ 文字が「t:xxx」のように出る</strong> → 翻訳の書き漏れです。AI に「日本語と英語、両方の翻訳が揃っているか確認して」と伝えてください。</li>
       </ul>
-      <p style="margin-top:12px;font-size:13px;color:var(--muted)">どれも「Claude に何と言えばいいか」の形にしてあります。原因の特定は Claude 側が実コードを読んで行います。</p>
+      <p style="margin-top:12px;font-size:13px;color:var(--muted)">どれも「AI に何と言えばいいか」の形にしてあります。原因の特定は AI 側が実コードを読んで行います。</p>
 
       <p style="margin-top:12px"><strong>検証プログラムが「検証エンジンが壊れています」と言ったとき</strong>は、製品 ZIP を展開し直してください。<span style="color:var(--muted)">（ZIP が壊れていると、検証が「合格」と誤って言ってしまうことがあるため、その状態を検知して止めるようにしています。）</span></p>
 
