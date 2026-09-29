@@ -146,9 +146,7 @@
    ※ **`COUNTUNIQUE` の結果は、あとから足してはいけない。** `keep` に列を入れると、その粒度ごとに重複が排除される＝**同じセッションが複数の行に現れる**。それをブラウザ側で `sum()` すると二重・三重に数える。実例（2026-08 実測）＝ページ別に `COUNTUNIQUE(allpv.session_id)` を出して合計すると **556**、実際の訪問は **309**（複数ページを見た訪問が重なった）。**サイト全体の値が欲しいときは、`keep` を空にした別の集計で取り直す**（`keep: []` ＋ `calc` のアグリゲート・MUST 6 の形）。VALID のまま、もっともらしい数字になる。
 
 9. **「先月」「今月」などの相対期間は、日付をベタ書きせず `date_range` フォームで受ける。**
-   使える相対トークンは `assistant-schema/definitions/step.schema.json` の `field.default` の description が正本＝**`last_7_days` / `last_28_days` / `last_30_days` / `last_90_days` / `this_week` / `last_week` / `this_month` / `last_month` の8つだけ**。
-   - **★`last_28_days`（過去28日）／`last_90_days`（過去90日）は次の版（仕様 2.16.0）から**（パートナーの要望で追加）。規則は `last_7_days` / `last_30_days` と同じ（最新の集計済みの日で終わる N 日間）。**カレンダーのプリセットボタンには出ない**＝`default` の初期値としてだけ効く。
-     **使うなら `"min_core_version": "2.16.0"` 以上を宣言する**（宣言が無い・低いと検証が `E_REF_MIN_CORE_VERSION` で止める）。宣言があれば、それより古い製品では配信時に「QA Assistants を更新してください」（`E_CORE_TOO_OLD`）で止まる＝利用者に理由が伝わる。**宣言せずに古い製品へ入れると**「知らないトークン」扱いで期間が未選択のまま送信でき、**データ取得が `Invalid time_range` で失敗する**（console に警告は出る）。
+   使える相対トークンは `assistant-schema/definitions/step.schema.json` の `field.default` の description が正本＝**`last_7_days` / `last_30_days` / `this_week` / `last_week` / `this_month` / `last_month` の6つだけ**。
    - **「先々月」に相当するトークンは無い**。期間比較で2つ目の月が要るときは、ユーザーに選ばせるか、**絶対範囲 `"YYYY-MM-DD/YYYY-MM-DD"` を `default` に書く**（これは効く＝動作確認用サイトの実機で反映を確認・2026-08-21）。
    - ⚠️ **ただし絶対範囲は、その環境の計測データ開始日に引きずられる。** 範囲**全体**が開始日より前だと**無選択**になり（「(未入力)」のまま submit でき、取得が `Invalid time_range` で失敗する＝動作確認用サイトの実機・2026-08-21）、範囲が開始日を**またぐ**と**開始側が黙って開始日にクランプされる**（指定と違う期間の数字が出る）。＝**絶対範囲を使うなら、その環境にデータが在る期間を選ぶ。**
    - フォームの値は **`<key>` 自身（`YYYY-MM-DD/YYYY-MM-DD` の1本の文字列）に入り、あわせて `<key>_start` / `<key>_end` へ分解される**＝**3つとも使える**（key が `period` なら `$period` / `$period_start` / `$period_end`）。**クエリの `time` に渡すのは分解後の2つ**。

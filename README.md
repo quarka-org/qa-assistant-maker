@@ -1,5 +1,7 @@
 # QA Assistant Maker
 
+> **ブランチの見方**＝`main` は配布されている QA Assistants／QA ZERO に合わせた内容。次の版で入る機能の記述は `next` ブランチにあり、その版の配布と同時に `main` へ取り込みます。
+
 QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生成する**ためのツールです。
 
 仕様書の写しは持たず、AI は**製品のコードそのもの**を読んで書きます。人が維持するのは `AGENTS.md`（AI 向けの指示書）と `guide.html`（人向けの説明）の2ページだけです。
