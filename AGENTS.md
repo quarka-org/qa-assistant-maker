@@ -23,7 +23,7 @@
    ⚠️ **見本は「動く見本」であって「正しい指標の見本」ではない**（MUST 3・4 を必ず読む）。
 2. **構造（何が書けるか）** — `assistant-schema/manifest.schema.json` → `assistant-schema/definitions/*.json`。
    **schema に無い書き方は存在しない**（runtime に実装があっても、schema が許さないなら使えない）。
-   **★唯一の例外＝テンプレート文字列の中の書式指定子（`{$var|round:1}` 等）。** これは schema が見ない層なので、**使えるものの一覧は `assistant-schema/vocab-ledger.json` の `format_specifiers`**（`min_core_version` つき）＝**使う前にここを見る**（`integer` / `float` / `percentage` / `duration` / `round` / `before` / `after`）。
+   **★唯一の例外＝テンプレート文字列の中の書式指定子（`{$var|round:1}` 等）。** これは schema が見ない層なので、**使えるものの一覧は `assistant-schema/vocab-ledger.json` の `format_specifiers`**（`min_core_version` つき）＝**使う前にここを見る**（`integer` / `float` / `percentage` / `duration` / `round` / `before` / `after`。**★次の版から `weekday`（仕様 2.18.0）・`signed`（仕様 2.21.0）が加わる**＝製品 ZIP の台帳に無いものは、その版では使えない）。
 3. **データの材料（何が取れるか）** — `yaml/materials-manifest.php`。
    フィールド名・型・**そのフィールドの本当の意味（`search_hint` の `note`）**を実物から取る。**推測で書かない。**
    **絞り込み可否（QAL の `filter` に書ける列）は materials-manifest には書かれていない。** 正本は **`yaml/qal-validation-2026-05-11.php` の `filter` の description（「Supported fields depend on material type」＝材料ごとの対象列の列挙）**。`note` に出てくる **`post_filter` は内部の実行方式の呼び名であって manifest に書ける語彙ではない**（「遅い」という性能の注記）。
@@ -88,12 +88,30 @@
    | `2.12.0` | `transform` の `extract_host` |
    | `2.13.0` | **`if` の器の拡張＝`all` / `else` / `then.set` / `is: "in"`** |
    | `2.14.0` | テンプレートの書式指定子 `round` / `before` / `after` |
+   | `2.16.0` | ★次の版から＝`date_range` の相対トークン `last_28_days` / `last_90_days`（MUST 9） |
+   | `2.17.0` | ★次の版から＝`date_range` の分解値 `<key>_days` / `<key>_start_dow` / `<key>_end_dow` を宣言して使う（MUST 9） |
+   | `2.18.0` | ★次の版から＝書式指定子 `weekday`（MUST 9） |
+   | `2.19.0` | ★次の版から＝**`if` の `is: "contains"`**（下の ⚠️） |
+   | `2.20.0` | ★次の版から＝システム変数 **`$sys.today` / `$sys.hour` / `$sys.dow`**（下の ⚠️） |
+   | `2.21.0` | ★次の版から＝書式指定子 **`signed`**（MUST 10） |
+
+   **宣言する版は1つ**＝使った書き方のうち**いちばん高い版**を書けば、それより下の要求もまとめて満たす（例＝次の版の書き方を `signed` まで使うなら `"min_core_version": "2.21.0"`）。
 
    ⚠️ **`eq` / `neq` は「どこに書くか」で変わる**（一括で対象外ではない）:
    - **`transform.filter` の `eq` / `neq`** … 値が何であっても（`"$var"` でも数値でも）**版数の宣言は要らない**。
    - **`if` の `eq` / `neq`** … **ただの文字列リテラル**（`"4"` 等）と `null` なら要らない。**`"$var"`（`"$sys.*"` を含む）は演算子によらず `2.11.0`**（表の 2.11.0 行のとおり）。**数値・真偽値のリテラルも `2.11.0`**——旧コアの `if` は厳密比較（`===`）で、フォームの値は必ず文字列＝**数値リテラルとの比較は旧コアでは永遠に成立しなかった**ため。
      実測（β2・2026-08-25）＝`if` は `value: "4"`（文字列）・`value: null` が VALID／**`value: "$satisfaction"`・`value: 4`・`value: true` は `E_REF_MIN_CORE_VERSION` で INVALID**。`transform.filter` は `eq: "$total_pv"`・`neq: "$total_pv"` とも VALID（**`gte: "$total_pv"` だけ INVALID**）。**同梱の見本 `qa-assistant-form-sample` が満足度を数値 `4` と比べている**ので、`gte` を `eq` に変えるだけで踏む。
    ⚠️ **`if` に `all`／`else`／`then.set`／`is: "in"` を1つでも使ったら `2.13.0`**——`$var` 比較の `2.11.0` から類推して低く宣言すると `E_REF_MIN_CORE_VERSION` で止まる（初見が実際に踏んだ・2026-08-25）。
+   ⚠️ **★次の版（仕様 2.19.0）から、`if` の `is` に `contains`（部分一致）が書ける**＝`{"if":{"var":"os_answer","is":"contains","value":"Windows"},"then":{"goto":"win"}}` は、答えが「Windows NT 6.1」でも成立する（`eq` だと不成立）。**大文字と小文字は区別する**（`"windows"` では不成立＝`transform.filter` の `contains` と同じ判定）。**`value` は空でない文字列か `"$var"`**＝空文字・省略・数値は検証が `E_REF_IF_CONTAINS_OPERAND` で止める（空は何にでも当たり、分岐が黙っていつも同じ方へ進むため）。**「含まない」の演算子は無い**＝`else` で書く。`all` の中に書いても同じ。**使うなら `2.19.0` 以上を宣言する**（古い製品は `contains` を知らないので、宣言が無いと開けないか会話がエラーで止まり、理由も伝わらない。宣言があれば「QA Assistants を更新してください」になる）。
+   ⚠️ **★次の版（仕様 2.20.0）から、システム変数に `$sys.today`（今日の日付＝`YYYY-MM-DD`）・`$sys.hour`（いまの「時」＝0〜23 の数）・`$sys.dow`（曜日＝0〜6・日曜＝0）が加わる**（それまでは `tracking_id` / `locale` / `tz` の3つ）。値は**サイトのタイムゾーンで、アシスタントのカードを選んだ時刻**に決まり、会話の途中では変わらない（見ている人の PC の時計は使わない）。曜日名は `{$sys.dow|weekday}`。**`if` の `var` は変数名なので `$sys.*` は書けない**＝いったん `set` で変数に写してから比べる（`hour` は数＝`gte` がそのまま数で比べる）:
+   ```json
+   { "set": { "h": "$sys.hour" } },
+   { "if":   { "var": "h", "is": "gte", "value": 12 },
+     "then": { "set": { "greeting": "こんにちは" } },
+     "else": { "set": { "greeting": "おはようございます" } } },
+   { "message": "{$greeting}。今日は {$sys.today}（{$sys.dow|weekday}）です。" }
+   ```
+   **計算式（`expr`）に使えるのは数の `$sys.hour` / `$sys.dow` だけ**＝`$sys.today` は文字列なので、式に書くと失敗して空になる（検証は参照名しか見ないので止まらない）。**使うなら `2.20.0` 以上を宣言する**——宣言せずに古い製品へ入れると、**翻訳文（`lang/*.json`）の中で使った場合は開けてしまい、値が空のまま黙って間違う**（午後でも「おはようございます」になる）。検証は翻訳文の中の使用も見て要求する。
 
 ### データの正しさ（ここが最も間違えやすい。検証器は助けてくれない）
 
@@ -166,7 +184,8 @@
     ⚠️ **`first()` は空文字の値も普通に拾う**（空の扱いは関数ごとに違う＝`count_distinct` は空文字を数えない）。流入元（`utm_source` 等）は**直接流入が空文字**で、サイトによっては空が最多（実測＝604PV・81.8%）＝「いちばん多いのは **** で…」と壊れた文になる。**空があり得る列を文章に使うときは、先に `filter` の `neq: ""` で空を除くか、空だった場合の文言を `if` の `not_empty` で分岐する**（`not_empty` は `if` 専用の演算子＝`transform.filter` には無い。filter で書ける演算子は `eq` / `neq` / `gt` / `gte` / `lt` / `lte` / `in` / `contains` の8つだけ）。⚠️ **この `neq: ""` で列名を打ち間違えると、警告も出ずに 0 件になる**＝MUST 4 の「ブラウザ側 `transform.filter` は列名を見ない」。
     ⚠️ **書式指定子は「見せ方」だけで、値を変換しない。** **`percentage` は 100 倍しない**（`0.0345` は `3.5%` ではなく **`0.0%`**）＝率を % で出すなら **`calc` の式で `* 100` してから**渡す。**`integer` は `parseInt`**＝`"1,234"` のような桁区切り入りの文字列は **`1`** になる（数値で渡す）。**`round` は `parseFloat`**＝`"3.567abc"` のような混ざった文字列も数値として丸める（＝壊れた値に気づけない）。**桁は `{$x|round:2}` のように `:` で指定する（既定は 0 桁）**＝`{$x|round}` は `3.567` を **`4`** にする。ここまでの見せ方の違いは、いずれも**エラーにも警告にもならない**。
     ※ **`round(2)` のような括弧の形は書けない**＝展開されず文字のまま画面に出るので、検証が `E_REF_TEMPLATE_SYNTAX` で止める。`round` を使う manifest は `min_core_version` 2.14.0 以上の宣言が要る（上の「唯一の例外」の台帳どおり）。
-    ※ **同じ規則の実装が2つある**＝テンプレート（`{$x|percentage}`）は `js/qahm-assistant-runtime.js` の `formatValue`／表の `columns[].type` は `js/qahm-assistant-table.js` の型。**100 倍しないのは両方とも同じだが、既定の小数桁が違う**（テンプレート 1 桁・表 2 桁＝表は `type_options.precision` で変えられる）。`round` / `before` / `after` は**テンプレート専用**（表の型には無い）。
+    ※ **★次の版（仕様 2.21.0）から、書式指定子 `signed` で正の値に「+」を付けられる**＝`前月比 {$diff|signed:1} ポイント` は、2.63 なら「前月比 +2.6 ポイント」、-1.24 なら「-1.2」（「+」を付けるための `if` の振り分けは要らない）。**桁は `signed:1` のように `signed` 自身に書く**（0〜6・丸め方は `round` と同じ）＝**指定子は1つしか付けられない**ので `{$diff|round:1|signed}` は書けない（検証が `E_REF_TEMPLATE_SYNTAX` で止める）。**桁を省くと丸めない**（`{$diff|signed}` は 2.6333 を「+2.6333」＝省くと 0 桁に丸める `round` とは逆）。**0 には符号を付けない**（-0.04 を `signed:1` にすると「0.0」＝「-0.0」は出ない）。数値に読めない値（「データなし」等）はそのまま出る。**使うなら `"min_core_version": "2.21.0"` 以上を宣言する**（古い製品は知らない指定子を素通りさせ、「+」も桁も効かない「2.63」がエラーなしで出るため）。翻訳文の中で使った場合も検証が要求する。
+    ※ **同じ規則の実装が2つある**＝テンプレート（`{$x|percentage}`）は `js/qahm-assistant-runtime.js` の `formatValue`／表の `columns[].type` は `js/qahm-assistant-table.js` の型。**100 倍しないのは両方とも同じだが、既定の小数桁が違う**（テンプレート 1 桁・表 2 桁＝表は `type_options.precision` で変えられる）。`round` / `before` / `after`（次の版から `weekday` / `signed` も）は**テンプレート専用**（表の型には無い）。
     ※ **行スコープの `calc` からは、先に `set_var` した `$var` を参照できる**（`{"calc":"share","expr":"session_count / $total_sessions * 100","scope":"row"}` のように、その行の列と全体の合計を混ぜてよい＝実測）。禁じられているのは**行スコープに純集計形を書くこと**（上記）であって、`$var` の参照ではない。ただし **`set_var` の順序が意味を持つ**＝参照する `$var` は、その `calc` より**前**の行で作っておく。
 
 11. **schema が受け付けない書き方は、runtime に実装があっても使えない。**
