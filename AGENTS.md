@@ -73,12 +73,14 @@
    検証が見るもの＝①manifest の**構造**（`E_SCHEMA_*`）②**参照の整合**（`E_REF_*`＝goto の飛び先・未宣言の変数・データ源/表/グラフの参照・計算式の文法・テンプレートの書き間違い・新しい書き方に要る `min_core_version`）③**翻訳**（`lang/*.json` の `t:` キー欠落・翻訳文の中のテンプレート）④**パッケージ構成**（`E_PKG_*`＝許可外のファイル・スタブ PHP の形・アイコン）。
    **★QA Assistants 5.3.0.0（WordPress.org の配布版）から `E_PKG_UNSCANNED` が出る**＝**検証が中を見なかった場所にファイルがあれば、その件数を報告する**（対象は `.git/` のみ。`".git/" contains N file(s) that were not inspected …`）。**中身は見ない＝「あることだけ言う」**（黙って見ないのをやめた、という趣旨）。⇒ **配るものに `.git/` を入れない。** `.DS_Store` / `Thumbs.db` / `.gitkeep` は従来どおり黙って無視される。**自分の版で出るかは、製品 ZIP の `class-qahm-assistant-schema-validator.php` に `E_PKG_UNSCANNED` が在るかで判る。**
    ⚠️ **VALID は「壊れていない」であって「正しい」ではない。** **QAL の中身（材料名・列名・集計の意味）は検証されない。** そこは自分で確かめる（MUST 3〜11）。
+   ※ **完了の前に一度、該当データが 0 件になる期間（計測はあるが、絞り込みに当たる訪問が無い期間）で動かし、0 が「0」と出ることを目で見る。** 0 件・分母 0 で数字が空になる形（MUST 10）は、検証器では見つからない。
    ※ ラッパーが `検証エンジンが壊れています` と言ったら、製品 ZIP を展開し直す。その状態の判定は信用しない。
    ※ ラッパーが `古い世代です` と表示したら、その製品 ZIP は②〜④を持たない＝構造だけの判定。goto の飛び先・変数・翻訳キーは自分で確かめる（MUST 15・16）。
    ※ **`E_SCHEMA_ONEOF` は原因のキー名を言わない**＝エラーの `/scenes/...` パス直下の step を `definitions/*.json` と見比べる（よくある実例＝`config_write.value` はオブジェクト必須・`if` の then/else に書けるのは `set`/`goto` だけ）。
 
 2. **`min_core_version` は、宣言するなら製品 ZIP の `qahm-const.php` の `QAHM_ASSISTANT_SPEC_VERSION` 以下の値にする。**
    宣言すると、それより古いコアでは**起動時にエラーで一切動かない**（`E_CORE_TOO_OLD`）。**判断できないなら省略する**（省略＝最大互換）。**根拠のない数字を書かない。**
+   ※ **0 件・分母 0 の表示はコアの版で違う**＝`2.14.0` 以前は**黙って 0**（`first` の空・ゼロ除算・式の書き間違いもすべて 0 に化ける）／`2.15.0` 以降は**空＋console 警告**。旧コアで 0 件を試しても空は見えない＝**MUST 10 の型を使い、0 件で確かめた表示のまま配るなら `2.15.0` 以上を宣言する**（検証器はこの宣言を要求しない＝自分で書く）。
    **どの書き方に何が要るか**（製品 ZIP で読める写し＝`class-qahm-assistant-schema-validator.php` の `check_min_core_version` の要求一覧。おおもとは製品の仕様書。忘れても検証器が `E_REF_MIN_CORE_VERSION` で止めて教えてくれる）:
 
    | 要る版 | それを要求する書き方 |
@@ -158,7 +160,22 @@
     `set_var`／全体 `calc`（`scope: "global"`）の式に書けるのは **①純集計形＝`sum` / `avg` / `count` / `count_distinct` / `min` / `max` / `first`（列名）** か **②`$var` だけで組んだ式**（`$a / $b * 100` 等）の2形——「N行目を参照する」機能は無い。**行の列名を含む式を global に書くと検証器が `E_REF_EXPR_SYNTAX` で止め、runtime も警告＋null（表示は —）**になる（黙って先頭行で計算することはもう無い）。逆に **行スコープの `calc` に純集計形（`sum(pv)`）を書くのも止められる**（合計が欲しいなら `scope: "global"`）。上位 N 件を1件ずつ使うとき（ランキングの個別発表等）は、**`first()` で先頭を変数に取り → その ID を `filter` の `neq` で除外 → 次の先頭を取る**、を繰り返す。
     ⚠️ **ただしこの繰り返しは、その data_source の `into` を空にする。** transform は**全ステップを最後まで通してから**結果を `into` に入れる（`js/qahm-assistant-runtime.js` の `applyTransforms` → `this.vars[ ds.into ] = data`）ので、5件ぶん `neq` で除外し終えた時点の**残り**が `into` に入る。⇒ **同じ `into` を後ろの `table` / `chart` でも使うと、除外した分だけ行が減る**（5件すべて除外すれば空・3件だけ発表すれば「5件のはずが2件しか出ない」）。**VALID・エラーなし・console 無言**＝静かに崩れる。**一覧表と個別発表を両方出したいなら、同じクエリを `into` を分けて2回取る**（除外ループは片方だけで回す）。※ **行の集合を別の変数へ退避する書き方は無い**＝`transform` の形は9つ（`sort`／`limit`／`filter`／`group_by`＋`agg`／`tally`／`calc`／`lookup`／`set_var`／`extract_host`）で、`set_var` に入るのは**スカラー**だけ。
     ⚠️ **`transform.sort` は複数キーを書けるが、実行時は最初の列しか使わない**（検証は通る・エラーなし＝実測）。多キーの並べ替えは 1 キーずつ `sort` を2段に分ける（先に2番目の列、次に1番目の列）。
-    ⚠️ **データ0件のとき集計（`min`/`max`/`first` 等）は空欄になり、console に `[assistant] … has no numeric values` の警告が出る**（黙って 0 にはならない＝実測）。
+    ⚠️ **データ0件のとき集計（`min`/`max`/`first` 等）は空欄になり、console に `[assistant] … has no numeric values`（`first` は `[assistant] first(…) has no rows`）の警告が出る**（黙って 0 にはならない＝実測）。
+    ⚠️ **0 のはずの数字が空になる形は2つ**（どちらも VALID のまま・実行して初めて出る）＝**①件数を `first(n)` で取っている**（該当 0 件だと行が無い）**②率の分母が 0**。null はテンプレートで空になる（`|integer`・`|round` は数値に読めない値をそのまま返す）。**型は次の3つ:**
+    - **件数は `sum(n)` か `count(列)` で取る。** 空集合で 0 を返すのはこの2つだけ（`avg`／`min`／`max`／`first` は null＝`first(n)` なら console に `first(n) has no rows (shown as empty)`）。
+    - **率は、分母が 0 になり得るなら、表示する前に `if` ＋ `then.set` で 0 を入れる**（`then.set` は `2.13.0`＝MUST 2）。文言ごと変えたい（「まだ訪問がありません」等）なら `then.goto` で別のシーンへ分ける。
+      ```json
+      "transform": [
+        { "set_var": "visits",     "expr": "sum(n)" },
+        { "set_var": "goals",      "expr": "sum(goal_n)" },
+        { "set_var": "goal_rate",  "expr": "$goals / $visits * 100" }
+      ]
+      ```
+      ```json
+      { "if": { "var": "visits", "is": "eq", "value": 0 }, "then": { "set": { "goal_rate": 0 } } }
+      ```
+      ⚠️ **率そのものを `is: "empty"` で受けて 0 を入れない**——式の書き間違い・未定義の `$var` による null まで 0 に化ける（下の「黙って 0」に戻る）。**分母を見て分岐する。**
+    - **分母が 0 の割り算は null（表示は空）＋ console 警告**（`[assistant] expression "$goals / $visits * 100" failed: division by zero (shown as empty)`）。黙って 0 にはならない（式の失敗はすべて同じ扱い＝2.14.0 以前は黙って 0 だった・MUST 2 の ※）。
     ⚠️ **`first()` は空文字の値も普通に拾う**（空の扱いは関数ごとに違う＝`count_distinct` は空文字を数えない）。流入元（`utm_source` 等）は**直接流入が空文字**で、サイトによっては空が最多（実測＝604PV・81.8%）＝「いちばん多いのは **** で…」と壊れた文になる。**空があり得る列を文章に使うときは、先に `filter` の `neq: ""` で空を除くか、空だった場合の文言を `if` の `not_empty` で分岐する**（`not_empty` は `if` 専用の演算子＝`transform.filter` には無い。filter で書ける演算子は `eq` / `neq` / `gt` / `gte` / `lt` / `lte` / `in` / `contains` の8つだけ）。⚠️ **この `neq: ""` で列名を打ち間違えると、警告も出ずに 0 件になる**＝MUST 4 の「ブラウザ側 `transform.filter` は列名を見ない」。
     ⚠️ **書式指定子は「見せ方」だけで、値を変換しない。** **`percentage` は 100 倍しない**（`0.0345` は `3.5%` ではなく **`0.0%`**）＝率を % で出すなら **`calc` の式で `* 100` してから**渡す。**`integer` は `parseInt`**＝`"1,234"` のような桁区切り入りの文字列は **`1`** になる（数値で渡す）。**`round` は `parseFloat`**＝`"3.567abc"` のような混ざった文字列も数値として丸める（＝壊れた値に気づけない）。**桁は `{$x|round:2}` のように `:` で指定する（既定は 0 桁）**＝`{$x|round}` は `3.567` を **`4`** にする。ここまでの見せ方の違いは、いずれも**エラーにも警告にもならない**。
     ※ **`round(2)` のような括弧の形は書けない**＝展開されず文字のまま画面に出るので、検証が `E_REF_TEMPLATE_SYNTAX` で止める。`round` を使う manifest は `min_core_version` 2.14.0 以上の宣言が要る（上の「唯一の例外」の台帳どおり）。
