@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "name": "Monthly Report with Comparison",
+    "description": "Pick a period and a comparison period follows it; sessions, users and pageviews are shown now, before and the difference"
+  },
+  "msg": {
+    "welcome": "Choose a period. Use 'Compare' in the calendar to choose how the comparison period is decided (preceding period, last year, etc.). It starts with 'Preceding period'.",
+    "head": "**Current period** = {$period_start} - {$period_end} ({$period_days} days) / **Comparison period** = {$period_compare_start} - {$period_compare_end} ({$period_compare_days} days)",
+    "head_now_only": "**Current period** = {$period_start} - {$period_end} ({$period_days} days)",
+    "note": "Difference = now - before. Users are the sum of daily users (the same count as the Visits report total).",
+    "partial": "Part of the comparison period ({$period_compare_start} - {$period_compare_end}) has no data, so the comparison is not shown.",
+    "no_prev": "The comparison period ({$period_compare_start} - {$period_compare_end}) has no sessions, so the comparison is not shown.",
+    "error": "Could not load the data. Please try again."
+  },
+  "form": {
+    "period": "Period"
+  },
+  "card": {
+    "sessions": "Sessions",
+    "users": "Users",
+    "pv": "Pageviews",
+    "sub_sessions": "Before {$prev_sessions|integer} ({$diff_sessions|signed:0}, {$rate_sessions|signed:1}%)",
+    "sub_users": "Before {$prev_users|integer} ({$diff_users|signed:0}, {$rate_users|signed:1}%)",
+    "sub_pv": "Before {$prev_pv|integer} ({$diff_pv|signed:0}, {$rate_pv|signed:1}%)"
+  },
+  "btn": {
+    "show": "Show",
+    "restart": "Start over"
+  },
+  "tbl": {
+    "summary": "By metric"
+  },
+  "col": {
+    "metric": "Metric",
+    "now": "Current period",
+    "prev": "Comparison period",
+    "diff": "Difference",
+    "rate": "Change (%)"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "name": "月次レポート（比較つき）",
+    "description": "期間を選ぶと比較期間が付いてきて、セッション・ユーザー・ページビューの今と前と差が並ぶ見本"
+  },
+  "msg": {
+    "welcome": "期間を選んでください。カレンダーの「比較」で、比べる期間の決め方（前の期間・前年 など）を選べます。最初は「前の期間」です。",
+    "head": "**今の期間**＝{$period_start} 〜 {$period_end}（{$period_days} 日）／**比較期間**＝{$period_compare_start} 〜 {$period_compare_end}（{$period_compare_days} 日）",
+    "head_now_only": "**今の期間**＝{$period_start} 〜 {$period_end}（{$period_days} 日）",
+    "note": "差＝今 − 前。ユーザー数は日ごとのユーザー数の合計です（訪問レポートの合計と同じ数え方）。",
+    "partial": "比較期間（{$period_compare_start} 〜 {$period_compare_end}）の一部にデータがないため、比較は出していません。",
+    "no_prev": "比較期間（{$period_compare_start} 〜 {$period_compare_end}）にセッションがないため、比較は出していません。",
+    "error": "データを取得できませんでした。もう一度お試しください。"
+  },
+  "form": {
+    "period": "期間"
+  },
+  "card": {
+    "sessions": "セッション数",
+    "users": "ユーザー数",
+    "pv": "ページビュー数",
+    "sub_sessions": "前 {$prev_sessions|integer}（{$diff_sessions|signed:0}・{$rate_sessions|signed:1}%）",
+    "sub_users": "前 {$prev_users|integer}（{$diff_users|signed:0}・{$rate_users|signed:1}%）",
+    "sub_pv": "前 {$prev_pv|integer}（{$diff_pv|signed:0}・{$rate_pv|signed:1}%）"
+  },
+  "btn": {
+    "show": "表示する",
+    "restart": "最初に戻る"
+  },
+  "tbl": {
+    "summary": "指標ごとの比較"
+  },
+  "col": {
+    "metric": "指標",
+    "now": "今の期間",
+    "prev": "比較期間",
+    "diff": "差",
+    "rate": "差（%）"
+  }
+}
