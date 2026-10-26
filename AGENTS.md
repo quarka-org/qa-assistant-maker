@@ -71,7 +71,7 @@
    php validate.php <展開した製品ZIPのパス> <作ったディレクトリ>
    ```
    `E_SCHEMA_*` / `E_REF_*` / `E_PKG_*` が 0 件で `VALID` と出るまで直す。**検証を通さずに「できました」と言わない。**
-   検証が見るもの＝①manifest の**構造**（`E_SCHEMA_*`）②**参照の整合**（`E_REF_*`＝goto の飛び先・未宣言の変数・データ源/表/グラフの参照・計算式の文法・テンプレートの書き間違い・新しい書き方に要る `min_core_version`）③**翻訳**（`lang/*.json` の `t:` キー欠落・翻訳文の中のテンプレート）④**パッケージ構成**（`E_PKG_*`＝許可外のファイル・スタブ PHP の形・アイコン）。
+   検証が見るもの＝①manifest の**構造**（`E_SCHEMA_*`）②**参照の整合**（`E_REF_*`＝goto の飛び先・未宣言の変数・データ源/表/グラフの参照・計算式の文法・テンプレートの書き間違い・新しい書き方に要る `min_core_version`・★次の版から＝読まずに既存の列を上書きする行の変換と、値が必ず消える変数名の衝突＝MUST 2 の下の表）③**翻訳**（`lang/*.json` の `t:` キー欠落・翻訳文の中のテンプレート）④**パッケージ構成**（`E_PKG_*`＝許可外のファイル・スタブ PHP の形・アイコン）。
    **★次の版から `E_PKG_UNSCANNED` が増える**＝**検証が中を見なかった場所にファイルがあれば、その件数を報告する**（対象は `.git/` のみ。`".git/" contains N file(s) that were not inspected …`）。**中身は見ない＝「あることだけ言う」**（黙って見ないのをやめた、という趣旨）。⇒ **配るものに `.git/` を入れない。** `.DS_Store` / `Thumbs.db` / `.gitkeep` は従来どおり黙って無視される。**自分の版で出るかは、製品 ZIP の `class-qahm-assistant-schema-validator.php` に `E_PKG_UNSCANNED` が在るかで判る。**
    ⚠️ **VALID は「壊れていない」であって「正しい」ではない。** **QAL の中身（材料名・列名・集計の意味）は検証されない。** そこは自分で確かめる（MUST 3〜11）。
    ※ ラッパーが `検証エンジンが壊れています` と言ったら、製品 ZIP を展開し直す。その状態の判定は信用しない。
@@ -102,6 +102,13 @@
 
    **宣言する版は1つ**＝使った書き方のうち**いちばん高い版**を書けば、それより下の要求もまとめて満たす（例＝次の版の書き方を `signed` まで使うなら `"min_core_version": "2.21.0"`）。
    **★この表の「次の版から」「β3 から」の書き方（2.16.0〜2.25.0）は、QA Assistants 5.3.1.0 β3（仕様 2.25.0）にすべて入っている。** 手元の製品で使えるのは、製品 ZIP の `qahm-const.php` の `QAHM_ASSISTANT_SPEC_VERSION` 以下の行だけ。
+
+   **検証が厳しくなっただけの版（`min_core_version` には書かない）**＝次の 2 つは書き方を増やしていない（β3 の次の版から・β3＝2.25.0 には入っていない）。**製品 ZIP の `QAHM_ASSISTANT_SPEC_VERSION` がこの版以上なら、ラッパーが次の形を INVALID にする**（宣言は要らない。書くと、それより古い製品で動かなくなるだけ）:
+
+   | 仕様 | INVALID になる形 |
+   |---|---|
+   | `2.25.1` | 行の `calc`・`lookup`・`extract_host` が、**その手順で読んでいない既存の列**（view の `keep`・`make` の `calc`・`group_by` の結果）に書く＝列の値が黙って置き換わる（`E_REF_COLUMN_OVERWRITE`）。**VALID のまま**＝その列を読む形（`lookup` の `key`＝`into`・`extract_host` の `from`＝`into`・`expr` にその列名）／同じ `transform` の中で自分が前に作った列の作り直し／`calc` の `scope: "global"`（列でなく変数に書く） |
+   | `2.25.2` | data source の `transform` が書く変数（`set_var`・`calc` の `scope: "global"`・`tally` の `into`）が**その data source の `into` と同名**（取得結果があとで上書きする）／**同じ `tally`** の中で `into` が重複＝値が必ず消える（`E_REF_VAR_COLLISION`）。**VALID のまま**＝`vars` の宣言と同名／別の data source が同じ変数に書く／同じ `transform` の中での再計算 |
 
    ⚠️ **`eq` / `neq` は「どこに書くか」で変わる**（一括で対象外ではない）:
    - **`transform.filter` の `eq` / `neq`** … 値が何であっても（`"$var"` でも数値でも）**版数の宣言は要らない**。
