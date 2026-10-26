@@ -25,7 +25,7 @@ QA Assistants / QA ZERO 用のアシスタントプラグインを **AI で生�
 qa-assistant-maker/
 ├── AGENTS.md                 指示書（AI が読む）
 ├── validate.php              検証プログラム
-├── examples/                 見本4本
+├── examples/                 見本5本
 ├── qa-heatmap-analytics/     ← 2 で置く製品のコード（サイトと同じ版）
 └── qa-assistant-{name}/      ← AI がここに作る
 ```
@@ -72,7 +72,7 @@ qa-assistant-maker/
 ├── validate.php           検証ラッパー（製品のコードに入っている検証エンジンを呼ぶだけの glue＝構造・参照の整合・翻訳・パッケージ構成の4検査を全部呼ぶ）
 ├── assets/
 │   └── default-icon.png   デフォルトアイコン
-└── examples/              動く見本4本（qa-assistant-sample / qa-assistant-form-sample / qa-assistant-hitokoto / qa-assistant-lp-bounce）
+└── examples/              動く見本5本（qa-assistant-sample / qa-assistant-form-sample / qa-assistant-hitokoto / qa-assistant-lp-bounce / qa-assistant-monthly-compare）
 ```
 
 - **仕様の説明書はこのリポジトリにありません。** schema・データ材料の一覧（semantics 宣言つき）・QAL 文法・動作コードは、すべて**製品のコードの中の実物**を読みます（`AGENTS.md` がパスを案内します）。
