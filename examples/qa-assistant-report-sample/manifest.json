@@ -1,0 +1,240 @@
+{
+  "id": "qa-assistant-report-sample",
+  "version": "1.0.0.0",
+  "icon": "icon.png",
+  "name": "t:meta.name",
+  "description": "t:meta.description",
+  "min_core_version": "2.26.0",
+
+  "vars": {
+    "period": "",
+    "period_start": "",
+    "period_end": "",
+    "period_days": 0,
+    "period_compare_start": "",
+    "period_compare_end": "",
+    "period_compare_days": "",
+    "period_compare_mode": "",
+    "period_compare_clamped": "",
+    "now_rows": [],
+    "prev_rows": [],
+    "source_rows": [],
+    "device_rows": [],
+    "now_sessions": 0,
+    "now_users": 0,
+    "now_pv": 0,
+    "now_bounce_count": 0,
+    "now_bounce": 0,
+    "prev_sessions": 0,
+    "prev_users": 0,
+    "prev_pv": 0,
+    "prev_bounce_count": 0,
+    "prev_bounce": 0,
+    "diff_sessions": 0,
+    "diff_users": 0,
+    "diff_pv": 0,
+    "diff_bounce": 0,
+    "rate_sessions": 0,
+    "rate_users": 0,
+    "rate_pv": 0
+  },
+
+  "data_sources": {
+    "now_total": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "summary_days_access_detail" }],
+        "time": { "start": "$period_start", "end": "$period_end", "tz": "$sys.tz" },
+        "make": {
+          "now_total": {
+            "from": ["summary_days_access_detail"],
+            "keep": ["summary_days_access_detail.device_id"],
+            "calc": {
+              "session_count": "SUM(summary_days_access_detail.session_count)",
+              "user_count": "SUM(summary_days_access_detail.user_count)",
+              "pv_count": "SUM(summary_days_access_detail.pv_count)",
+              "bounce_count": "SUM(summary_days_access_detail.bounce_count)"
+            },
+            "add": ["session_count", "user_count", "pv_count", "bounce_count"]
+          }
+        },
+        "result": { "use": "now_total", "limit": 5000 }
+      },
+      "into": "now_rows",
+      "transform": [
+        { "set_var": "now_sessions", "expr": "sum(session_count)" },
+        { "set_var": "now_users", "expr": "sum(user_count)" },
+        { "set_var": "now_pv", "expr": "sum(pv_count)" },
+        { "set_var": "now_bounce_count", "expr": "sum(bounce_count)" },
+        { "set_var": "now_bounce", "expr": "$now_bounce_count / $now_sessions * 100" }
+      ]
+    },
+    "prev_total": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "summary_days_access_detail" }],
+        "time": { "start": "$period_compare_start", "end": "$period_compare_end", "tz": "$sys.tz" },
+        "make": {
+          "prev_total": {
+            "from": ["summary_days_access_detail"],
+            "keep": ["summary_days_access_detail.device_id"],
+            "calc": {
+              "session_count": "SUM(summary_days_access_detail.session_count)",
+              "user_count": "SUM(summary_days_access_detail.user_count)",
+              "pv_count": "SUM(summary_days_access_detail.pv_count)",
+              "bounce_count": "SUM(summary_days_access_detail.bounce_count)"
+            },
+            "add": ["session_count", "user_count", "pv_count", "bounce_count"]
+          }
+        },
+        "result": { "use": "prev_total", "limit": 5000 }
+      },
+      "into": "prev_rows",
+      "transform": [
+        { "set_var": "prev_sessions", "expr": "sum(session_count)" },
+        { "set_var": "prev_users", "expr": "sum(user_count)" },
+        { "set_var": "prev_pv", "expr": "sum(pv_count)" },
+        { "set_var": "prev_bounce_count", "expr": "sum(bounce_count)" },
+        { "set_var": "prev_bounce", "expr": "$prev_bounce_count / $prev_sessions * 100" },
+        { "set_var": "diff_sessions", "expr": "$now_sessions - $prev_sessions" },
+        { "set_var": "diff_users", "expr": "$now_users - $prev_users" },
+        { "set_var": "diff_pv", "expr": "$now_pv - $prev_pv" },
+        { "set_var": "diff_bounce", "expr": "$now_bounce - $prev_bounce" },
+        { "set_var": "rate_sessions", "expr": "($now_sessions - $prev_sessions) / $prev_sessions * 100" },
+        { "set_var": "rate_users", "expr": "($now_users - $prev_users) / $prev_users * 100" },
+        { "set_var": "rate_pv", "expr": "($now_pv - $prev_pv) / $prev_pv * 100" }
+      ]
+    },
+    "sources": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "summary_days_access_detail" }],
+        "time": { "start": "$period_start", "end": "$period_end", "tz": "$sys.tz" },
+        "make": {
+          "by_source": {
+            "from": ["summary_days_access_detail"],
+            "keep": ["summary_days_access_detail.source_domain"],
+            "calc": { "session_count": "SUM(summary_days_access_detail.session_count)" },
+            "add": ["session_count"]
+          }
+        },
+        "result": { "use": "by_source", "limit": 5000 }
+      },
+      "into": "source_rows",
+      "transform": [
+        { "filter": { "source_domain": { "neq": "" } } },
+        { "filter": { "source_domain": { "neq": "direct" } } },
+        { "sort": { "session_count": "desc" } },
+        { "limit": 8 }
+      ]
+    },
+    "devices": {
+      "type": "qal",
+      "query": {
+        "tracking_id": "$sys.tracking_id",
+        "materials": [{ "name": "allpv" }],
+        "time": { "start": "$period_start", "end": "$period_end", "tz": "$sys.tz" },
+        "make": {
+          "by_device": {
+            "from": ["allpv"],
+            "keep": ["allpv.device_type"],
+            "calc": { "sessions": "COUNTUNIQUE(allpv.session_id)" },
+            "add": ["sessions"]
+          }
+        },
+        "result": { "use": "by_device", "limit": 50 }
+      },
+      "into": "device_rows",
+      "transform": [
+        { "sort": { "sessions": "desc" } }
+      ]
+    }
+  },
+
+  "tables": {
+    "summary": {
+      "title": "t:tbl.summary",
+      "columns": [
+        { "key": "metric", "label": "t:col.metric", "type": "string" },
+        { "key": "now", "label": "t:col.now", "type": "integer" },
+        { "key": "prev", "label": "t:col.prev", "type": "integer" },
+        { "key": "diff", "label": "t:col.diff", "type": "integer", "type_options": { "signed": true } },
+        { "key": "rate", "label": "t:col.rate", "type": "percentage", "type_options": { "signed": true, "precision": 1 } }
+      ],
+      "rows": [
+        { "metric": "t:card.sessions", "now": "$now_sessions", "prev": "$prev_sessions", "diff": "$diff_sessions", "rate": "$rate_sessions" },
+        { "metric": "t:card.users", "now": "$now_users", "prev": "$prev_users", "diff": "$diff_users", "rate": "$rate_users" },
+        { "metric": "t:card.pv", "now": "$now_pv", "prev": "$prev_pv", "diff": "$diff_pv", "rate": "$rate_pv" }
+      ],
+      "options": { "filtering": false, "per_page": 10 }
+    }
+  },
+
+  "charts": {
+    "sources": {
+      "title": "t:chart.sources",
+      "source": "$source_rows",
+      "type": "hbar",
+      "x": "source_domain",
+      "series": [{ "field": "session_count", "label": "t:card.sessions" }]
+    },
+    "devices": {
+      "title": "t:chart.devices",
+      "source": "$device_rows",
+      "type": "doughnut",
+      "x": "device_type",
+      "series": [{ "field": "sessions", "label": "t:card.sessions" }]
+    }
+  },
+
+  "scorecards": {
+    "overview": {
+      "title": "t:card.title",
+      "cards": [
+        { "label": "t:card.sessions", "value": "{$now_sessions|integer}", "sub": "t:card.sub_sessions" },
+        { "label": "t:card.users", "value": "{$now_users|integer}", "sub": "t:card.sub_users" },
+        { "label": "t:card.pv", "value": "{$now_pv|integer}", "sub": "t:card.sub_pv" },
+        { "label": "t:card.bounce", "value": "{$now_bounce|round:1}", "unit": "%", "sub": "t:card.sub_bounce" }
+      ]
+    }
+  },
+
+  "scenes": {
+    "start": [
+      { "message": "t:msg.welcome" },
+      { "form": { "fields": [{ "key": "period", "type": "date_range", "label": "t:form.period", "default": "last_28_days", "compare": "previous" }], "submit": "t:btn.show" } },
+      { "fetch": "now_total", "on_error": "error" },
+      { "if": { "var": "period_compare_start", "is": "empty" }, "then": { "goto": "no_prev" } },
+      { "if": { "var": "period_compare_clamped", "is": "eq", "value": "1" }, "then": { "goto": "no_prev" } },
+      { "fetch": "prev_total", "on_error": "error" },
+      { "if": { "var": "prev_sessions", "is": "eq", "value": "0" }, "then": { "goto": "no_prev" } },
+      { "fetch": "sources", "on_error": "error" },
+      { "fetch": "devices", "on_error": "error" },
+      { "goto": "report" }
+    ],
+    "report": [
+      { "message": "t:msg.title", "report": true },
+      { "message": "t:msg.head", "report": true },
+      { "scorecard": "overview", "report": true },
+      { "table": "summary", "report": true },
+      { "chart": "sources", "report": true },
+      { "chart": "devices", "report": true },
+      { "callout": { "title": "t:insight.title", "text": "t:insight.text", "level": "info" }, "report": true },
+      { "message": "t:msg.ideas_head", "report": true },
+      { "html": "t:html.ideas", "report": true },
+      { "message": "t:msg.save_hint" },
+      { "choices": [{ "label": "t:btn.restart", "goto": "start", "clear": true }] }
+    ],
+    "no_prev": [
+      { "message": "t:msg.no_prev" },
+      { "choices": [{ "label": "t:btn.restart", "goto": "start", "clear": true }] }
+    ],
+    "error": [
+      { "message": "t:msg.error" },
+      { "choices": [{ "label": "t:btn.restart", "goto": "start", "clear": true }] }
+    ]
+  }
+}

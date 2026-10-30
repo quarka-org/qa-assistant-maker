@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "name": "レポート出力の見本",
+    "description": "期間を選ぶと、概要の数字・期間比較の表・流入元とデバイスのグラフ・気づき・改善案が並び、「レポートを保存」でレポートだけの HTML を書き出せる見本"
+  },
+  "msg": {
+    "welcome": "期間を選んでください。カレンダーの「比較」で、比べる期間の決め方（前の期間・前年 など）を選べます。最初は「前の期間」です。",
+    "title": "## サイトの状況レポート",
+    "head": "今の期間＝{$period_start} 〜 {$period_end}（{$period_days} 日）／比較期間＝{$period_compare_start} 〜 {$period_compare_end}（{$period_compare_days} 日）",
+    "ideas_head": "## 改善案",
+    "save_hint": "会話の上の「レポートを保存」を押すと、ここまでの結果をレポートだけの HTML で保存できます（キャラクターや吹き出しは入りません）。保存した HTML はブラウザで開いて、印刷から PDF にもできます。",
+    "no_prev": "比較期間にデータがないため、レポートを作れませんでした。別の期間を選んでください。",
+    "error": "データを取得できませんでした。もう一度お試しください。"
+  },
+  "form": {
+    "period": "期間"
+  },
+  "card": {
+    "title": "概要",
+    "sessions": "セッション数",
+    "users": "ユーザー数",
+    "pv": "ページビュー数",
+    "bounce": "直帰率",
+    "sub_sessions": "前 {$prev_sessions|integer}（{$diff_sessions|signed:0}・{$rate_sessions|signed:1}%）",
+    "sub_users": "前 {$prev_users|integer}（{$diff_users|signed:0}・{$rate_users|signed:1}%）",
+    "sub_pv": "前 {$prev_pv|integer}（{$diff_pv|signed:0}・{$rate_pv|signed:1}%）",
+    "sub_bounce": "前 {$prev_bounce|round:1}%（{$diff_bounce|signed:1} ポイント）"
+  },
+  "tbl": {
+    "summary": "期間比較"
+  },
+  "col": {
+    "metric": "指標",
+    "now": "今の期間",
+    "prev": "比較期間",
+    "diff": "差",
+    "rate": "差（%）"
+  },
+  "chart": {
+    "sources": "流入元ドメイン別のセッション（上位 8・直接の訪問を除く）",
+    "devices": "デバイス別のセッション"
+  },
+  "insight": {
+    "title": "気づき",
+    "text": "セッションは比較期間と比べて **{$diff_sessions|signed:0}**（{$rate_sessions|signed:1}%）、直帰率は **{$diff_bounce|signed:1} ポイント** でした。流入元とデバイスの内訳は上のグラフのとおりです。"
+  },
+  "html": {
+    "ideas": "<ul><li>セッションが増えた流入元は、その流入元から入るページの導線を見直して、次のページへ進みやすくします。</li><li>直帰率が上がったときは、入口のページの最初の画面で「何のページか」がすぐ伝わるかを確かめます。</li><li>スマートフォンの割合が高いときは、スマートフォンでの表示速度とボタンの押しやすさを優先して直します。</li></ul>"
+  },
+  "btn": {
+    "show": "表示する",
+    "restart": "最初に戻る"
+  }
+}

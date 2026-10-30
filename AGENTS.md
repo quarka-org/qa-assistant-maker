@@ -15,12 +15,13 @@
 
 ## 1. どこに何があるか（読む順序）
 
-1. **`examples/`（この一式に同梱）** — 動く見本5本。**近い型をまねる**：
+1. **`examples/`（この一式に同梱）** — 動く見本6本。**近い型をまねる**：
    - `qa-assistant-sample`＝データを見せる型（ページ別ランキング＋メモ保存）
    - `qa-assistant-form-sample`＝入力・設定だけの型
    - `qa-assistant-hitokoto`＝**データ源ゼロの最小形**（ボタン1つで一言。どの環境でも動く）
    - `qa-assistant-lp-bounce`＝**最大形**（`data_sources` 2本＝サイト全体〔`keep: []`〕＋ページ別／`scorecard`／`table` の `color_thresholds` と **`row_action`**（行クリックで詳細へ）／`tally`／`if` の `all`・`else`）
    - `qa-assistant-monthly-compare`＝**期間の比較の型**（★β3 から＝期間欄の `compare` で比較期間を受け取り、同じクエリを2回取って「今・前・差」を `rows` の表と scorecard に出す。差の列は `signed`。`min_core_version` 2.25.0）
+   - `qa-assistant-report-sample`＝**レポートの型**（★次の版から＝見せる部品に `"report": true` を付け、結果を「レポートを保存」でレポートだけの HTML に書き出す。概要の数字カード → 期間比較の表 → グラフ2種 → 気づき → 改善案。取り直しは「最初に戻る」〔`clear: true`〕。`min_core_version` 2.26.0）
    ⚠️ **見本は「動く見本」であって「正しい指標の見本」ではない**（MUST 3・4 を必ず読む）。
 2. **構造（何が書けるか）** — `assistant-schema/manifest.schema.json` → `assistant-schema/definitions/*.json`。
    **schema に無い書き方は存在しない**（runtime に実装があっても、schema が許さないなら使えない）。
@@ -99,9 +100,10 @@
    | `2.23.0` | ★次の版から＝`date_range` の `default` の **`previous_of:<key>` / `year_ago_of:<key>`**（2つ目の期間の既定値・MUST 9） |
    | `2.24.0` | ★β3 から＝`date_range` 欄の **`compare`**（選んだ期間に付いてくる比較期間）を書く／**`<key>_compare_*`** を宣言する（MUST 9） |
    | `2.25.0` | ★β3 から＝表の列の **`type_options.signed`**・**`tables.<name>.rows`**・グラフの **`series[].dashed`**（MUST 10） |
+   | `2.26.0` | ★次の版から＝見せる系の step の **`"report": true`**・**`charts.<name>.report_table`**（レポートの書き出し・下の ⚠️。**`false` でも要る**） |
 
    **宣言する版は1つ**＝使った書き方のうち**いちばん高い版**を書けば、それより下の要求もまとめて満たす（例＝次の版の書き方を `signed` まで使うなら `"min_core_version": "2.21.0"`）。
-   **★この表の「次の版から」「β3 から」の書き方（2.16.0〜2.25.0）は、QA Assistants 5.3.1.0 β3（仕様 2.25.0）にすべて入っている。** 手元の製品で使えるのは、製品 ZIP の `qahm-const.php` の `QAHM_ASSISTANT_SPEC_VERSION` 以下の行だけ。
+   **★この表の「次の版から」「β3 から」の書き方（2.16.0〜2.25.0）は、QA Assistants 5.3.1.0 β3（仕様 2.25.0）にすべて入っている。** **2.26.0 は β3 の次の版から**（β3 には入っていない）。手元の製品で使えるのは、製品 ZIP の `qahm-const.php` の `QAHM_ASSISTANT_SPEC_VERSION` 以下の行だけ。
 
    **検証が厳しくなっただけの版（`min_core_version` には書かない）**＝次の 2 つは書き方を増やしていない（β3 の次の版から・β3＝2.25.0 には入っていない）。**製品 ZIP の `QAHM_ASSISTANT_SPEC_VERSION` がこの版以上なら、ラッパーが次の形を INVALID にする**（宣言は要らない。書くと、それより古い製品で動かなくなるだけ）:
 
@@ -137,6 +139,18 @@
    - **入れただけでは何も届かない**＝サイトの持ち主がアシスタント一覧のカードで通知ごとに ON にしたものだけ届く（既定 OFF・押せるのは WordPress の管理者）。宛先と件名は書けない（宛先＝製品の設定のメールアドレス）。届く時刻は「宣言の時刻**以降に、サイトが最初に開かれたとき**」＝アクセスの少ないサイトでは遅れる。
    - **QA ZERO では動かない**（製品が無視する）。`validate.php` は警告も出さず VALID のまま＝**ZERO 向けに作るなら自分で気をつける**（アシスタント自体は ZERO でも動き、通知だけが届かない）。
    - **使うなら `2.22.0` 以上を宣言する**（古い製品は root の知らないキーとして配信時に止まる）。
+   ⚠️ **★次の版（仕様 2.26.0・β3 には入っていない）から、結果を「レポートだけの HTML」で書き出せる**＝見せる系の step（`message`・`table`・`chart`・`scorecard`・`callout`・`divider`・`html`）に **`"report": true`** を書くと、その部品が出たときから結果の下の帯に「レポートを保存」が出る。押すと**印の付いた部品だけ**を組み直した1ファイルの HTML が保存される（キャラ・吹き出し・選択肢・入力欄は入らない・サーバーには何も残らない）。印の無いアシスタントは今までどおり（ボタンも出ない）:
+   ```json
+   { "message": "## 期間比較", "report": true },
+   { "scorecard": "overview", "report": true },
+   { "table": "summary", "report": true },
+   { "chart": "sources", "report": true }
+   ```
+   - レポートでの形＝`message` は**1行で40字以下なら見出し**（`## 見出し` も）・それ以外は段落／`table` は**全行・`initial_sort` の並び**（画面で並べ替えた状態は入らない）／`chart` は**画像と、その下に同じ行の表**（受け取った人が数字を直せるように）＝表が要らないグラフは `charts.<name>.report_table: false`／`scorecard`・`callout` は `level` の色つき。表紙（アシスタント名・サイト・期間・作成日）は自動で付く。
+   - **同じ step が何度か動いたら最新の1回だけ**・**会話から消えた部品（`clear: true`）は入らない**・**form の送信が回の区切り**（いちばん新しい部品より前に送信があれば、その送信より前の部品は入らない）。⇒ **期間を変えて取り直す流れは、form に戻る choices の `clear: true`（「最初に戻る」）で作る**（形は `examples/qa-assistant-report-sample`）。form を通らずに `set` で取り直すと、前の回の部品が混ざる。結果の文言を条件で変えるときも、別の scene の callout に分けると前の回の側が残りうる＝**`if` の `then.set`／`else.set` で文言の変数を切り替え、callout は1つ**にする。
+   - 並びは「最新の回で出た順」＝同じ会話で A → B → A と行き来すると、B の部品が A より前に来る。
+   - **見た目はアシスタントの側で決めない**＝アシスタントに CSS を書く場所は無い。色や体裁は**サイトの管理者が管理画面で CSS を1つ貼って**決める（書き出した HTML の中だけに効く・外部の読み込みや `data:` 以外の `url()` は保存のときに止まる）。何も貼らなくても既定のデザイン（印刷用の A4 の指定つき）で出る。
+   - **使うなら `"min_core_version": "2.26.0"` 以上を宣言する**＝`report`・`report_table` は **`false` でもキーがあるだけで要る**（無い・低いと検証が `E_REF_MIN_CORE_VERSION` で止める。古い製品は知らないキーとして配信時に止まる）。見せる系以外の step（`form`・`choices` 等）に書く・`true`／`false` 以外（`"true"` 等）を書くと `E_SCHEMA_ONEOF`。**仕様 2.26.0 より古い製品 ZIP で検証すると、`report` 自体が知らないキーとして `E_SCHEMA_*` で止まる**（その製品では使えない）。
 
 ### データの正しさ（ここが最も間違えやすい。検証器は助けてくれない）
 
