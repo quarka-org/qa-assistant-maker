@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "name": "Report Export Sample",
+    "description": "Pick a period to see overview numbers, a period comparison table, source and device charts, an insight and improvement ideas; 'Save report' exports only the report as HTML"
+  },
+  "msg": {
+    "welcome": "Choose a period. Use 'Compare' in the calendar to choose how the comparison period is decided (preceding period, last year, etc.). It starts with 'Preceding period'.",
+    "title": "## Site report",
+    "head": "Current period = {$period_start} - {$period_end} ({$period_days} days) / Comparison period = {$period_compare_start} - {$period_compare_end} ({$period_compare_days} days)",
+    "ideas_head": "## Improvement ideas",
+    "save_hint": "Press 'Save report' above the conversation to save these results as a report-only HTML file (no character or chat bubbles). Open it in a browser and print it to make a PDF.",
+    "no_prev": "The comparison period has no data, so the report could not be made. Please choose another period.",
+    "error": "Could not load the data. Please try again."
+  },
+  "form": {
+    "period": "Period"
+  },
+  "card": {
+    "title": "Overview",
+    "sessions": "Sessions",
+    "users": "Users",
+    "pv": "Pageviews",
+    "bounce": "Bounce rate",
+    "sub_sessions": "Before {$prev_sessions|integer} ({$diff_sessions|signed:0}, {$rate_sessions|signed:1}%)",
+    "sub_users": "Before {$prev_users|integer} ({$diff_users|signed:0}, {$rate_users|signed:1}%)",
+    "sub_pv": "Before {$prev_pv|integer} ({$diff_pv|signed:0}, {$rate_pv|signed:1}%)",
+    "sub_bounce": "Before {$prev_bounce|round:1}% ({$diff_bounce|signed:1} points)"
+  },
+  "tbl": {
+    "summary": "Period comparison"
+  },
+  "col": {
+    "metric": "Metric",
+    "now": "Current period",
+    "prev": "Comparison period",
+    "diff": "Difference",
+    "rate": "Difference (%)"
+  },
+  "chart": {
+    "sources": "Sessions by source domain (top 8, excluding direct visits)",
+    "devices": "Sessions by device"
+  },
+  "insight": {
+    "title": "Insight",
+    "text": "Compared with the comparison period, sessions changed by **{$diff_sessions|signed:0}** ({$rate_sessions|signed:1}%) and the bounce rate by **{$diff_bounce|signed:1} points**. See the charts above for sources and devices."
+  },
+  "html": {
+    "ideas": "<ul><li>For sources whose sessions grew, review the paths from their landing pages so visitors move on to the next page more easily.</li><li>When the bounce rate rises, check that the first screen of each landing page tells visitors right away what the page is about.</li><li>When the smartphone share is high, fix smartphone page speed and tap targets first.</li></ul>"
+  },
+  "btn": {
+    "show": "Show",
+    "restart": "Start over"
+  }
+}
