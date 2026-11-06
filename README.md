@@ -27,7 +27,7 @@ qa-assistant-maker/
 ├── validate.php              検証プログラム
 ├── examples/                 見本6本
 ├── qa-heatmap-analytics/     ← 2 で置く製品のコード（サイトと同じ版）
-└── qa-assistant-{name}/      ← AI がここに作る
+└── qa-assistant-{name}-{rand}/  ← AI がここに作る（{rand}＝ランダム6文字）
 ```
 
 ### AI に作らせる（使う AI に合わせて A か B）
@@ -36,7 +36,7 @@ qa-assistant-maker/
 
 1. Maker のフォルダを開いて AI を起動する（Claude Code なら、そのフォルダで `claude` を実行）。指示書 `AGENTS.md` が自動で読み込まれます（Codex・Cursor・GitHub Copilot のコーディングエージェント・Jules・Windsurf・Zed・Aider など。Claude Code は `CLAUDE.md` 経由で同じものを読みます。Gemini CLI は設定が要ります。対応しているツールの最新の一覧は [agents.md](https://agents.md/) を参照）。自動で読み込まれない AI では、最初に「`AGENTS.md` に従って作って」と伝えてください。
 2. 「〜を分析するアシスタントを作りたい」等、ふつうの日本語で頼む。AI は構成を一度だけ確認してから生成に入ります。
-3. AI が自分で検証コマンド（`php validate.php ./qa-heatmap-analytics ./qa-assistant-{name}`）を回して **VALID** を報告します。示されなければ「検証は通った？」と聞いてください。
+3. AI が自分で検証コマンド（`php validate.php ./qa-heatmap-analytics ./qa-assistant-{name}-{rand}`）を回して **VALID** を報告します。示されなければ「検証は通った？」と聞いてください。
 
 **B. フォルダを ZIP で渡す AI（ChatGPT など）**
 
@@ -53,11 +53,11 @@ qa-assistant-maker/
 できたら、アシスタントのフォルダ（manifest.json、lang/ja.json、lang/en.json、PHP、icon.png）を丸ごと1つの ZIP にして、ダウンロードできるようにしてください。
 ```
 
-3. AI は ZIP の中の指示書と見本を読み、5ファイルを作って自分で検証を回し、VALID の出力とアシスタントの ZIP を返します。作れない項目があれば先に報告してくるので、別の内容に変えて続けてください。ZIP を展開すると `qa-assistant-{name}/` ができます（2026-09 に ChatGPT 有料版で確認）。
+3. AI は ZIP の中の指示書と見本を読み、5ファイルを作って自分で検証を回し、VALID の出力とアシスタントの ZIP を返します。作れない項目があれば先に報告してくるので、別の内容に変えて続けてください。ZIP を展開すると `qa-assistant-{name}-{rand}/` ができます（2026-09 に ChatGPT 有料版で確認）。
 
 ### 仕上げ（どちらの AI でも共通）
 
-1. **WordPress に入れる**＝`qa-assistant-{name}/` を `wp-content/plugins/` に置いて有効化する（ZIP のまま「プラグインのアップロード」でも可）。「AI アシスタント」画面にカードとして現れます。
+1. **WordPress に入れる**＝`qa-assistant-{name}-{rand}/` を `wp-content/plugins/` に置いて有効化する（ZIP のまま「プラグインのアップロード」でも可）。「AI アシスタント」画面にカードとして現れます。
 2. **実データで数字を見る**＝VALID は「壊れていない」であって「数字が正しい」ではありません。管理画面の数字と桁が合っているか、期間を広げて数字が減らないかを見てください。おかしければ AI に「この数字が管理画面と合わない。材料の選び方を実コードで確認して」と伝えます。
 
 人向けの詳しい説明（渡すもの・正本マップ・「VALID」の意味・動かないときの3チェック）は **[guide.html](./guide.html)** を参照してください。
@@ -84,8 +84,10 @@ qa-assistant-maker/
 | `manifest.json` | アシスタントの動作定義 |
 | `lang/ja.json` | 日本語翻訳 |
 | `lang/en.json` | 英語翻訳 |
-| `qa-assistant-{name}.php` | WordPress プラグインヘッダー |
+| `qa-assistant-{name}-{rand}.php` | WordPress プラグインヘッダー |
 | `icon.png` | アイコン（無指定なら `assets/default-icon.png` をコピー） |
+
+名前（フォルダ名＝PHP のファイル名＝manifest の `id`）の後ろの `{rand}` は、別の人の作品と名前がかぶらないためのランダムな6文字です（例 `qa-assistant-monthly-report-7k2m9x`）。最初に1回だけ決まり、作り直しても変わりません。
 
 ## 動作環境
 
